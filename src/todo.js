@@ -1,22 +1,8 @@
 function createTodo(inputedId, title, details, dueDate, priority, isFinished) {
     const id = inputedId;
-    const getId = () => {
-        id;
-    }
-    const getTitle = () => {
-        title;
-    }
-    const getDetails = () => {
-        details;
-    }
-    const getDueDate = () => {
-        dueDate;
-    }
-    const getPriority = () => {
-        priority;
-    }
-    const getIsFinished = () => {
-        isFinished;
+
+    const getTodo = () => {
+        return {id, title, details, dueDate, priority, isFinished};
     }
     const setTitle = (newTitle) => {
         title = newTitle;
@@ -33,8 +19,11 @@ function createTodo(inputedId, title, details, dueDate, priority, isFinished) {
     const setIsFinished = (newBoolean) => {
         isFinished = newBoolean;
     }
-    return {getId, getTitle, getDetails, getDueDate, getPriority, getIsFinished
-           ,setTitle, setDetails, setDueDate, setPriority, setIsFinished}
+    const print = () => {
+        console.log(id, title, details, dueDate, priority, isFinished);
+    }
+
+    return {getTodo, setTitle, setDetails, setDueDate, setPriority, setIsFinished, print}
 }
 
 export { createTodo }

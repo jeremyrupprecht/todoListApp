@@ -1,13 +1,7 @@
 function createNote(inputedId, title, details) {
     const id = inputedId;
-    const getId = () => {
-        id;
-    }
-    const getTitle = () => {
-        title;
-    }
-    const getDetails = () => {
-        details;
+    const getNote = () => {
+        return {id, title, details}
     }
     const setTitle = (newTitle) => {
         title = newTitle;
@@ -15,7 +9,10 @@ function createNote(inputedId, title, details) {
     const setDetails = (newDetails) => {
         details = newDetails
     }
-    return {getId, getTitle, getDetails, setTitle, setDetails}
+    const print = () => {
+        console.log(id, title, details);
+    }
+    return {getNote, setTitle, setDetails, print}
 }
 
 export { createNote }

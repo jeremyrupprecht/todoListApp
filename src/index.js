@@ -1,7 +1,9 @@
 import './style.css';
 import Icon from './testIcon.png';
+import {format, startOfDay, startOfToday} from 'date-fns';
+import { createStateManager } from './stateManager';
 
- function component() {
+function component() {
     const element = document.createElement('div');
 
     element.innerHTML = "testing..........";
@@ -12,7 +14,17 @@ import Icon from './testIcon.png';
     myIcon.src = Icon;
     element.appendChild(myIcon);
 
-    return element;
- }
+    const testDate = format(new Date(2023, 0, 11), 'yyyy/MM/dd');
+    console.log(testDate);
 
- document.body.appendChild(component());
+    return element;
+}
+
+document.body.appendChild(component());
+
+
+
+let state = createStateManager();
+let testDate = format(startOfToday(), 'yyyy/MM/dd');
+state.createAndSaveTodo(0, 'note1', 'test note details', 
+                        testDate, 'yyyy/MM/dd', 'low', false);

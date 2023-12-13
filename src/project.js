@@ -1,13 +1,8 @@
 function createProject(inputedId, title, todos) {
     const id = inputedId;
-    const getId = () => {
-        id;
-    }
-    const getTitle = () => {
-        title;
-    }
-    const getTodos = () => {
-        todos;
+
+    const getProject = () => {
+        return {id, title, todos}
     }
     const setTitle = (newTitle) => {
         title = newTitle;
@@ -21,7 +16,10 @@ function createProject(inputedId, title, todos) {
             todos.splice(index, 1);
         }
     }
-    return {getId, getTitle, getTodos, setTitle, addTodo, removeTodo}
+    const print = () => {
+        console.log(id, title, todos);
+    }
+    return {getProject, setTitle, addTodo, removeTodo, print}
 }
 
 export { createProject }
