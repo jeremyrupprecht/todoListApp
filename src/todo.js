@@ -1,11 +1,5 @@
-function createTodo() {
-    const id = 0;
-    let title = "";
-    let details = "";
-    let dueDate = "";
-    let priority = "low";
-    let isFinished = false;
-
+function createTodo(inputedId, title, details, dueDate, priority, isFinished) {
+    const id = inputedId;
     const getId = () => {
         id;
     }
@@ -24,7 +18,6 @@ function createTodo() {
     const getIsFinished = () => {
         isFinished;
     }
-
     const setTitle = (newTitle) => {
         title = newTitle;
     }
@@ -43,3 +36,5 @@ function createTodo() {
     return {getId, getTitle, getDetails, getDueDate, getPriority, getIsFinished
            ,setTitle, setDetails, setDueDate, setPriority, setIsFinished}
 }
+
+export { createTodo }
