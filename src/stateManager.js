@@ -6,11 +6,20 @@ import { de } from "date-fns/locale";
 function createStateManager() {
 
     const getTodosOfThisProject = (project) => {
-
+        const todoIds = project.getProject().todos;
+        const todosToReturn = [];
+        for (let i = 0; i < todoIds.length; i++) {
+            const todo = localStorage.getItem(`todo-${todoIds[i]}`);
+            if (todo) {
+                todosToReturn.push(todo);
+            }
+        }
+        return todosToReturn;
     }
 
     const getTodosDueAtThisDate = (date) => {
-
+        // This function will retrive all the todos for this specific 
+        // date
     }
 
     const createAndSaveTodo = (id, title, details, dueDate, priority, isFinished) => {
@@ -46,6 +55,10 @@ function createStateManager() {
         return newNote;
     }
 
+    const addTodoToProject = (todoToAdd, projectToBeAddedto) => {
+        // This function will add a todo to a project
+    }
+
     const editTodo = (todoToEdit, title, details, dueDate, priority) => {
         todoToEdit.setTodoValues(title, details, dueDate, priority);
         localStorage.setItem(`todo-${todoToEdit.getTodo().id}`, JSON.stringify(todoToEdit.getTodo())); 
@@ -78,7 +91,7 @@ function createStateManager() {
         localStorage.removeItem(`note-${noteToDelete.getNote().id}`);
     }
 
-    return {createAndSaveTodo, createAndSaveProject, createAndSaveNote, editTodo, editProjectTitle,
+    return {getTodosOfThisProject, createAndSaveTodo, createAndSaveProject, createAndSaveNote, editTodo, editProjectTitle,
         editNoteTitle, editNoteDetails, deleteTodo, deleteProject, deleteNote}
 }
 
