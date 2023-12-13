@@ -31,9 +31,7 @@ function createStateManager() {
     const createAndSaveTodo = (id, title, details, dueDate, priority, isFinished) => {
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished);
         todos.push(newTodo);
-        localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo()));
-        const retrievedTodo = localStorage.getItem(`todo-${id}`);
-        // printTodo(retrievedTodo);
+        localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
         return newTodo;
     }
 
@@ -41,8 +39,6 @@ function createStateManager() {
         const newProject = createProject(id, title, todos);
         projects.push(newProject);
         localStorage.setItem(`project-${id}`, JSON.stringify(newProject.getProject()));
-        const retrievedProject = localStorage.getItem(`project-${id}`);
-        // printProject(retrievedProject);
         return newProject;
     }
 
@@ -50,8 +46,6 @@ function createStateManager() {
         const newNote = createNote(id, title, details);
         notes.push(newNote);
         localStorage.setItem(`note-${id}`, JSON.stringify(newNote.getNote()));
-        const retrievedNote = localStorage.getItem(`note-${id}`);
-        // printNote(retrievedNote);
         return newNote;
     }
 
