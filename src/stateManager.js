@@ -1,77 +1,75 @@
 import { createTodo } from "./todo";
 import { createProject } from "./project";
 import { createNote } from "./note";
-import { printTodo, printProject, printNote, printTodos, printProjects, printNotes} from "./logger";
 
 function createStateManager() {
-    const todos = [];
-    const projects = [];
-    const notes = [];
 
-    const getTodos = () => {
-        todos;        
-    }
-    const getProjects = () => {
-        projects;
-    }
-    const getNotes = () => {
-        notes;
+    const getTodosOfThisProject = (project) => {
+
     }
 
-    const getTodo = (index) => {
-        return todos[index];        
-    }
-    const getProject = (index) => {
-        return projects[index];        
-    }
-    const getNote = (index) => {
-        return notes[index];         
+    const getTodosDueAtThisDate = (date) => {
+
     }
 
     const createAndSaveTodo = (id, title, details, dueDate, priority, isFinished) => {
+        // Don't allow duplicate id's
+        if (localStorage.getItem(`todo-${id}`)) {
+            console.log("A Todo with that id already exists!");
+            return
+        }
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished);
-        todos.push(newTodo);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
         return newTodo;
     }
 
     const createAndSaveProject = (id, title, todos) => {
+        // Don't allow duplicate id's
+        if (localStorage.getItem(`project-${id}`)) {
+            console.log("A Project with that id already exists!");
+            return
+        }
         const newProject = createProject(id, title, todos);
-        projects.push(newProject);
         localStorage.setItem(`project-${id}`, JSON.stringify(newProject.getProject()));
         return newProject;
     }
 
     const createAndSaveNote = (id, title, details) => {
+        // Don't allow duplicate id's
+        if (localStorage.getItem(`note-${id}`)) {
+            console.log("A Note with that id already exists!");
+            return
+        }
         const newNote = createNote(id, title, details);
-        notes.push(newNote);
         localStorage.setItem(`note-${id}`, JSON.stringify(newNote.getNote()));
         return newNote;
     }
 
+    const editTodo = (todoToEdit, title, details, dueDate, priority, isFinished) => {
+
+    }
+
+    const editProject = (projectToEdit, title, details) => {
+
+    }
+
+    const editNote = (noteToEdit, title, details) => {
+
+    }
+
     const deleteTodo = (todoToDelete) => {
-        todos.splice(todos.indexOf(todoToDelete), 1);
-        // NEED TO DELETE FROM LOCAL STORAGE
+        localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
     }
 
     const deleteProject = (projectToDelete) => {
-        projects.splice(projects.indexOf(projectToDelete), 1);
-        // NEED TO DELETE FROM LOCAL STORAGE
+        localStorage.removeItem(`project-${projectToDelete.getProject().id}`);
     }
 
     const deleteNote = (noteToDelete) => {
-        notes.splice(notes.indexOf(noteToDelete), 1);
-        // NEED TO DELETE FROM LOCAL STORAGE
+        localStorage.removeItem(`note-${noteToDelete.getNote().id}`);
     }
 
-    // ALSO NEED TO ALLOW TODO, PROJECT AND NOTE EDITS TO BE 
-    // REFLECTED IN LOCAL STORAGE --> EITHER HERE OR IN THE
-    // TODO, PROJECT AND NODE MODULES THEMSELVES
-    // PROBABLY HERE --> FITS WITH SINGLE RESPONSIBILITY 
-    // BETTER??
-
-    return {getTodos, getProjects, getNotes, getTodo, getProject, getNote,
-            createAndSaveTodo, createAndSaveProject, createAndSaveNote, 
+    return {createAndSaveTodo, createAndSaveProject, createAndSaveNote, 
             deleteTodo, deleteProject, deleteNote}
 }
 

@@ -29,12 +29,16 @@ let state = createStateManager();
 let testDate = format(startOfToday(), 'yyyy/MM/dd');
 let testTodo = state.createAndSaveTodo(0, 'TODO 1', 'test note details', 
                                         testDate, 'low', false);
-let testTodo2 = state.createAndSaveTodo(1, 'TODO TWOO', 'test note details', 
+let testTodo2 = state.createAndSaveTodo(0, 'TODO TWOO', 'test todo details', 
                                         testDate, 'low', false);
-console.log(testTodo.getTodo());
 
-let testProject = state.createAndSaveProject(0, 'The first project', [testTodo.getTodo().id, testTodo2.getTodo().id]);
-console.log(testProject.getProject());
+
+let testProject = state.createAndSaveProject(0, 'The first project', [testTodo.getTodo().id]);
+console.log(localStorage);
+let testProject2 = state.createAndSaveProject(0, 'The first project', [testTodo.getTodo().id]);
+console.log(localStorage);
+
 
 let testNote = state.createAndSaveNote(0, 'NOTEYYYY', 'Im a note!!');
-console.log(testNote.getNote());
+let testNote2 = state.createAndSaveNote(0, 'NOTEYYYY', 'Im a note!!');
+
