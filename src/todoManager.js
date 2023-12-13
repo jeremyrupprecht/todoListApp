@@ -1,18 +1,19 @@
 import { createTodo } from "./todo";
 
-function createTodoManager() {
+function createTodoManager(projectManager) {
 
     const getAllTodos = () => {
 
     }
 
-    const createAndSaveTodo = (id, title, details, dueDate, priority, isFinished) => {
+    const createAndSaveTodo = (id, title, details, dueDate, priority, isFinished, parentProjectId) => {
         // Don't allow duplicate id's
         if (localStorage.getItem(`todo-${id}`)) {
             console.log("A Todo with that id already exists!");
             return
         }
-        const newTodo = createTodo(id, title, details, dueDate, priority, isFinished);
+        const newTodo = createTodo(id, title, details, dueDate, priority, isFinished, parentProjectId);
+        console.log(newTodo.getTodo().parentProjectId);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
         return newTodo;
     }
@@ -23,7 +24,16 @@ function createTodoManager() {
     }
 
     const deleteTodo = (todoToDelete) => {
-        localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
+        if (localStorage.getItem(`todo-${todoToDelete.getTodo().id}`)) {
+            localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
+            // Remove todo id reference from this todo's parent project (if it has one)
+            const parentProjectId = todoToDelete.getTodo().parentProjectId;
+
+            if (parentProjectId) {
+                const projectToRemoveFrom = projectManager.getProjectFromStorage(parentProjectId);
+                projectManager.removeTodoFromProject(todoToDelete, projectToRemoveFrom);
+            } 
+        }
     } 
 
     return {getAllTodos, createAndSaveTodo, editTodo, deleteTodo}

@@ -1,8 +1,9 @@
-function createTodo(inputedId, title, details, dueDate, priority, isFinished) {
+function createTodo(inputedId, title, details, dueDate, priority, isFinished, inputtedParentProjectId) {
     const id = inputedId;
+    const parentProjectId = inputtedParentProjectId;
 
     const getTodo = () => {
-        return {id, title, details, dueDate, priority, isFinished};
+        return {id, title, details, dueDate, priority, isFinished, parentProjectId};
     }
     // When a todo is edited, the user has the option to edit every value
     // but the isFinished flag, these values are always edited with a single
@@ -14,18 +15,6 @@ function createTodo(inputedId, title, details, dueDate, priority, isFinished) {
         priority = newPriority;
     }
 
-    // const setTitle = (newTitle) => {
-    //     title = newTitle;
-    // }
-    // const setDetails = (newDetails) => {
-    //     details = newDetails
-    // }
-    // const setDueDate = (newDueDate) => {
-    //     dueDate = newDueDate;
-    // }
-    // const setPriority = (newPriority) => {
-    //     priority = newPriority;
-    // }
     const setIsFinished = (newBoolean) => {
         isFinished = newBoolean;
     }

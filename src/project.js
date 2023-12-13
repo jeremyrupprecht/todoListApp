@@ -11,7 +11,9 @@ function createProject(inputedId, title, todoIds) {
         todoIds.push(todoId);
     }
     const removeTodo = (todoIdToRemove) => {
-        let index = todoIdToRemove.id;
+        let index = todoIds.indexOf(todoIdToRemove);
+        console.log('INDEX', index);
+        console.log('HEYYYYYYY');
         if (index > -1) { 
             todoIds.splice(index, 1);
         }

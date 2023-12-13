@@ -3,6 +3,13 @@ import { createProject } from "./project";
 
 function createProjectManager() {
 
+    const getProjectFromStorage = (id) => {
+        const projectToGet = localStorage.getItem(`project-${id}`);
+        if (projectToGet) {
+            return projectToGet
+        }
+    }
+
     const getTodosOfThisProject = (project) => {
         const todoIds = project.getProject().todoIds;
         const todosToReturn = [];
@@ -22,6 +29,11 @@ function createProjectManager() {
     const addTodoToProject = (todoToAdd, projectToBeAddedto) => {
         projectToBeAddedto.addTodo(todoToAdd.getTodo().id);
         localStorage.setItem(`project-${projectToBeAddedto.getProject().id}`, JSON.stringify(projectToBeAddedto.getProject()));
+    }
+
+    const removeTodoFromProject = (todoToRemove, projectToRemoveFrom) => {
+        projectToRemoveFrom.removeTodo(todoToRemove.getTodo().id);
+        localStorage.setItem(`project-${projectToRemoveFrom.getProject().id}`, JSON.stringify(projectToRemoveFrom.getProject()));
     }
 
     const createAndSaveProject = (id, title, todos) => {
@@ -44,7 +56,7 @@ function createProjectManager() {
         localStorage.removeItem(`project-${projectToDelete.getProject().id}`);
     }
 
-    return {getTodosOfThisProject, getTodosDueAtThisDate, addTodoToProject, createAndSaveProject, editProjectTitle,
+    return {getProjectFromStorage, getTodosOfThisProject, getTodosDueAtThisDate, addTodoToProject, removeTodoFromProject, createAndSaveProject, editProjectTitle,
             deleteProject}
 }
 
