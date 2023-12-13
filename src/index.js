@@ -23,31 +23,41 @@ document.body.appendChild(component());
 
 
 localStorage.clear();
-const todoManager = createTodoManager();
-const projectManager = createProjectManager();
-const noteManager = createNoteManager();
+const todoState = createTodoManager();
+const projectState = createProjectManager();
+const noteState = createNoteManager();
 
 let testDate = format(startOfToday(), 'yyyy/MM/dd');
-let todo1 = todoManager.createAndSaveTodo(0, 'TODO 0', 'test note details', 
+let todo1 = todoState.createAndSaveTodo(0, 'TODO 0', 'test note details', 
                                         testDate, 'low', false);
-let todo2 = todoManager.createAndSaveTodo(1, 'TODO 1', 'test todo details2', 
+let todo2 = todoState.createAndSaveTodo(1, 'TODO 1', 'test todo details2', 
                                         testDate, 'high', false);
 
-let todo3 = todoManager.createAndSaveTodo(3, 'TODO 3', 'test todo details3', 
+let todo3 = todoState.createAndSaveTodo(3, 'TODO 3', 'test todo details3', 
                                         testDate, 'low', false);
                                                                  
-let todo4 = todoManager.createAndSaveTodo(4, 'TODO 4', 'test todo details4', 
+let todo4 = todoState.createAndSaveTodo(4, 'TODO 4', 'test todo details4', 
                                         testDate, 'medium', false);
 
 
-let testProject = projectManager.createAndSaveProject(0, 'The first project', [todo1.getTodo().id, todo2.getTodo().id, todo3.getTodo().id, todo4.getTodo().id]);
-console.log(projectManager.getTodosOfThisProject(testProject));
+let testProject = projectState.createAndSaveProject(0, 'The first project', []);
+console.log(projectState.getTodosOfThisProject(testProject));
+projectState.addTodoToProject(todo1, testProject);
+console.log(projectState.getTodosOfThisProject(testProject));
+projectState.addTodoToProject(todo2, testProject);
+console.log(projectState.getTodosOfThisProject(testProject));
+projectState.addTodoToProject(todo3, testProject);
+console.log(projectState.getTodosOfThisProject(testProject));
+projectState.addTodoToProject(todo4, testProject);
+console.log(projectState.getTodosOfThisProject(testProject));
+
+
 // let testProject2 = state.createAndSaveProject(0, 'The first project', [testTodo.getTodo().id]);
 // console.log(localStorage);
 
 // let newDate = format(endOfMonth(new Date(2014, 8, 2, 11, 55, 0)), 'yyyy/MM/dd');
 // state.editTodo(testTodo, 'new Title!', 'new Details!', newDate, 'medium');
 
-let testNote = noteManager.createAndSaveNote(0, 'NOTEYYYY', 'Im a note!!');
-let testNote2 = noteManager.createAndSaveNote(1, 'NOTEYYYY', 'Im a note!!');
+let testNote = noteState.createAndSaveNote(0, 'NOTEYYYY', 'Im a note!!');
+let testNote2 = noteState.createAndSaveNote(1, 'NOTEYYYY', 'Im a note!!');
 

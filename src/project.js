@@ -1,19 +1,19 @@
-function createProject(inputedId, title, todos) {
+function createProject(inputedId, title, todoIds) {
     const id = inputedId;
 
     const getProject = () => {
-        return {id, title, todos}
+        return {id, title, todoIds}
     }
     const setTitle = (newTitle) => {
         title = newTitle;
     }
-    const addTodo = (newTodo) => {
-        todos.push(newTodo);
+    const addTodo = (todoId) => {
+        todoIds.push(todoId);
     }
-    const removeTodo = (todoToRemove) => {
-        let index = todoToRemove.id;
+    const removeTodo = (todoIdToRemove) => {
+        let index = todoIdToRemove.id;
         if (index > -1) { 
-            todos.splice(index, 1);
+            todoIds.splice(index, 1);
         }
     }
     return {getProject, setTitle, addTodo, removeTodo}

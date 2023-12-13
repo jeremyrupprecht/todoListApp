@@ -4,7 +4,7 @@ import { createProject } from "./project";
 function createProjectManager() {
 
     const getTodosOfThisProject = (project) => {
-        const todoIds = project.getProject().todos;
+        const todoIds = project.getProject().todoIds;
         const todosToReturn = [];
         for (let i = 0; i < todoIds.length; i++) {
             const todo = localStorage.getItem(`todo-${todoIds[i]}`);
@@ -16,8 +16,12 @@ function createProjectManager() {
     }
 
     const getTodosDueAtThisDate = (date) => {
-        // This function will retrive all the todos for this specific 
-        // date
+
+    }
+
+    const addTodoToProject = (todoToAdd, projectToBeAddedto) => {
+        projectToBeAddedto.addTodo(todoToAdd.getTodo().id);
+        localStorage.setItem(`project-${projectToBeAddedto.getProject().id}`, JSON.stringify(projectToBeAddedto.getProject()));
     }
 
     const createAndSaveProject = (id, title, todos) => {
@@ -31,10 +35,6 @@ function createProjectManager() {
         return newProject;
     }
 
-    const addTodoToProject = (todoToAdd, projectToBeAddedto) => {
-        // This function will add a todo to a project
-    }
-
     const editProjectTitle = (projectToEdit, title) => {
         projectToEdit.setTitle(title);
         localStorage.setItem(`project-${projectToEdit.getProject().id}`, JSON.stringify(projectToEdit.getProject())); 
@@ -44,7 +44,7 @@ function createProjectManager() {
         localStorage.removeItem(`project-${projectToDelete.getProject().id}`);
     }
 
-    return {getTodosOfThisProject, getTodosDueAtThisDate, createAndSaveProject, editProjectTitle,
+    return {getTodosOfThisProject, getTodosDueAtThisDate, addTodoToProject, createAndSaveProject, editProjectTitle,
             deleteProject}
 }
 

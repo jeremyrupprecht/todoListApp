@@ -2,6 +2,10 @@ import { createTodo } from "./todo";
 
 function createTodoManager() {
 
+    const getAllTodos = () => {
+
+    }
+
     const createAndSaveTodo = (id, title, details, dueDate, priority, isFinished) => {
         // Don't allow duplicate id's
         if (localStorage.getItem(`todo-${id}`)) {
@@ -20,9 +24,9 @@ function createTodoManager() {
 
     const deleteTodo = (todoToDelete) => {
         localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
-    }
+    } 
 
-    return {createAndSaveTodo, editTodo, deleteTodo}
+    return {getAllTodos, createAndSaveTodo, editTodo, deleteTodo}
 }
 
 export { createTodoManager }
