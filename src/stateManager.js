@@ -1,6 +1,7 @@
 import { createTodo } from "./todo";
 import { createProject } from "./project";
 import { createNote } from "./note";
+import { de } from "date-fns/locale";
 
 function createStateManager() {
 
@@ -45,16 +46,24 @@ function createStateManager() {
         return newNote;
     }
 
-    const editTodo = (todoToEdit, title, details, dueDate, priority, isFinished) => {
-
+    const editTodo = (todoToEdit, title, details, dueDate, priority) => {
+        todoToEdit.setTodoValues(title, details, dueDate, priority);
+        localStorage.setItem(`todo-${todoToEdit.getTodo().id}`, JSON.stringify(todoToEdit.getTodo())); 
     }
 
-    const editProject = (projectToEdit, title, details) => {
-
+    const editProjectTitle = (projectToEdit, title) => {
+        projectToEdit.setTitle(title);
+        localStorage.setItem(`project-${projectToEdit.getProject().id}`, JSON.stringify(projectToEdit.getProject())); 
     }
 
-    const editNote = (noteToEdit, title, details) => {
+    const editNoteTitle = (noteToEdit, title) => {
+        noteToEdit.setTitle(title);
+        localStorage.setItem(`note-${noteToEdit.getNote().id}`, JSON.stringify(noteToEdit.getNote())); 
+    }
 
+    const editNoteDetails = (noteToEdit, details) => {
+        noteToEdit.setDetails(details);
+        localStorage.setItem(`note-${noteToEdit.getNote().id}`, JSON.stringify(noteToEdit.getNote())); 
     }
 
     const deleteTodo = (todoToDelete) => {
@@ -69,8 +78,8 @@ function createStateManager() {
         localStorage.removeItem(`note-${noteToDelete.getNote().id}`);
     }
 
-    return {createAndSaveTodo, createAndSaveProject, createAndSaveNote, 
-            deleteTodo, deleteProject, deleteNote}
+    return {createAndSaveTodo, createAndSaveProject, createAndSaveNote, editTodo, editProjectTitle,
+        editNoteTitle, editNoteDetails, deleteTodo, deleteProject, deleteNote}
 }
 
 export { createStateManager }
