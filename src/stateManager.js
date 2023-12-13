@@ -51,15 +51,24 @@ function createStateManager() {
 
     const deleteTodo = (todoToDelete) => {
         todos.splice(todos.indexOf(todoToDelete), 1);
+        // NEED TO DELETE FROM LOCAL STORAGE
     }
 
     const deleteProject = (projectToDelete) => {
         projects.splice(projects.indexOf(projectToDelete), 1);
+        // NEED TO DELETE FROM LOCAL STORAGE
     }
 
     const deleteNote = (noteToDelete) => {
         notes.splice(notes.indexOf(noteToDelete), 1);
+        // NEED TO DELETE FROM LOCAL STORAGE
     }
+
+    // ALSO NEED TO ALLOW TODO, PROJECT AND NOTE EDITS TO BE 
+    // REFLECTED IN LOCAL STORAGE --> EITHER HERE OR IN THE
+    // TODO, PROJECT AND NODE MODULES THEMSELVES
+    // PROBABLY HERE --> FITS WITH SINGLE RESPONSIBILITY 
+    // BETTER??
 
     return {getTodos, getProjects, getNotes, getTodo, getProject, getNote,
             createAndSaveTodo, createAndSaveProject, createAndSaveNote, 
