@@ -17,3 +17,5 @@ function createNote(inputedId, title, details) {
     }
     return {getId, getTitle, getDetails, setTitle, setDetails}
 }
+
+export { createNote }
