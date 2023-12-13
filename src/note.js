@@ -9,10 +9,7 @@ function createNote(inputedId, title, details) {
     const setDetails = (newDetails) => {
         details = newDetails
     }
-    const print = () => {
-        console.log(id, title, details);
-    }
-    return {getNote, setTitle, setDetails, print}
+    return {getNote, setTitle, setDetails}
 }
 
 export { createNote }

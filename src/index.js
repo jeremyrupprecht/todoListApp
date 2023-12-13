@@ -14,8 +14,8 @@ function component() {
     myIcon.src = Icon;
     element.appendChild(myIcon);
 
-    const testDate = format(new Date(2023, 0, 11), 'yyyy/MM/dd');
-    console.log(testDate);
+    // const testDate = format(new Date(2023, 0, 11), 'yyyy/MM/dd');
+    // console.log(testDate);
 
     return element;
 }
@@ -23,8 +23,18 @@ function component() {
 document.body.appendChild(component());
 
 
-
+localStorage.clear();
 let state = createStateManager();
+
 let testDate = format(startOfToday(), 'yyyy/MM/dd');
-state.createAndSaveTodo(0, 'note1', 'test note details', 
-                        testDate, 'yyyy/MM/dd', 'low', false);
+let testTodo = state.createAndSaveTodo(0, 'TODO 1', 'test note details', 
+                                        testDate, 'low', false);
+let testTodo2 = state.createAndSaveTodo(1, 'TODO TWOO', 'test note details', 
+                                        testDate, 'low', false);
+console.log(testTodo.getTodo());
+
+let testProject = state.createAndSaveProject(0, 'The first project', [testTodo.getTodo().id, testTodo2.getTodo().id]);
+console.log(testProject.getProject());
+
+let testNote = state.createAndSaveNote(0, 'NOTEYYYY', 'Im a note!!');
+console.log(testNote.getNote());

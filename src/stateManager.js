@@ -1,6 +1,7 @@
 import { createTodo } from "./todo";
 import { createProject } from "./project";
 import { createNote } from "./note";
+import { printTodo, printProject, printNote, printTodos, printProjects, printNotes} from "./logger";
 
 function createStateManager() {
     const todos = [];
@@ -11,22 +12,19 @@ function createStateManager() {
         todos;        
     }
     const getProjects = () => {
-        projects
+        projects;
     }
     const getNotes = () => {
         notes;
     }
 
-    const getTodo = (todoToGet) => {
-        let index = todos.indexOf(todoToGet);
+    const getTodo = (index) => {
         return todos[index];        
     }
-    const getProject = (projectToGet) => {
-        let index = projects.indexOf(projectToGet);
+    const getProject = (index) => {
         return projects[index];        
     }
-    const getNote = (noteToGet) => {
-        let index = notes.indexOf(noteToGet);
+    const getNote = (index) => {
         return notes[index];         
     }
 
@@ -35,19 +33,26 @@ function createStateManager() {
         todos.push(newTodo);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo()));
         const retrievedTodo = localStorage.getItem(`todo-${id}`);
-        console.log('RETRIEVED', retrievedTodo);
+        // printTodo(retrievedTodo);
+        return newTodo;
     }
 
     const createAndSaveProject = (id, title, todos) => {
         const newProject = createProject(id, title, todos);
         projects.push(newProject);
-        printProjects();
+        localStorage.setItem(`project-${id}`, JSON.stringify(newProject.getProject()));
+        const retrievedProject = localStorage.getItem(`project-${id}`);
+        // printProject(retrievedProject);
+        return newProject;
     }
 
     const createAndSaveNote = (id, title, details) => {
         const newNote = createNote(id, title, details);
         notes.push(newNote);
-        printNotes();
+        localStorage.setItem(`note-${id}`, JSON.stringify(newNote.getNote()));
+        const retrievedNote = localStorage.getItem(`note-${id}`);
+        // printNote(retrievedNote);
+        return newNote;
     }
 
     const deleteTodo = (todoToDelete) => {
@@ -60,18 +65,6 @@ function createStateManager() {
 
     const deleteNote = (noteToDelete) => {
         notes.splice(notes.indexOf(noteToDelete), 1);
-    }
-
-    // these might break the single responsibility principle??
-    // MOVE THESE OUT TO A LOGGER MODULE LATER...
-    const printTodos = () => {
-        console.log(todos);
-    }
-    const printProjects = () => {
-        console.log(projects);
-    }
-    const printNotes = () => {
-        console.log(notes);
     }
 
     return {getTodos, getProjects, getNotes, getTodo, getProject, getNote,

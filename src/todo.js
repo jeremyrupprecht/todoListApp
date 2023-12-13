@@ -19,11 +19,7 @@ function createTodo(inputedId, title, details, dueDate, priority, isFinished) {
     const setIsFinished = (newBoolean) => {
         isFinished = newBoolean;
     }
-    const print = () => {
-        console.log(id, title, details, dueDate, priority, isFinished);
-    }
-
-    return {getTodo, setTitle, setDetails, setDueDate, setPriority, setIsFinished, print}
+    return {getTodo, setTitle, setDetails, setDueDate, setPriority, setIsFinished}
 }
 
 export { createTodo }
