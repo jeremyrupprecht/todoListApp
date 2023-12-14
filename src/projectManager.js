@@ -2,6 +2,7 @@ import { createProject } from "./project";
 
 function createProjectManager(todoManager) {
 
+    // TODO'S DON'T NEED TO KNOW ABOUT THIS
     const getProjectFromStorage = (id) => {
         const projectValues = JSON.parse(localStorage.getItem(`project-${id}`));
         if (projectValues) {
@@ -11,6 +12,7 @@ function createProjectManager(todoManager) {
         }
     }
 
+    // TODO'S DON'T NEED TO KNOW ABOUT THIS
     const getTodosOfThisProject = (project) => {
         const todoIds = project.getProject().todoIds;
         const todosToReturn = [];
@@ -23,23 +25,25 @@ function createProjectManager(todoManager) {
         return todosToReturn;
     }
 
+    // TODO'S DON'T NEED TO KNOW ABOUT THIS
     const getTodosDueAtThisDate = (date) => {
 
     }
 
-    // NEED TODO IN STORAGE TO KNOW ABOUT THIS
+    // SUBSCRIBE TO MEDIATOR 
     const addTodoToProject = (todoToAdd, projectToBeAddedto) => {
         projectToBeAddedto.addTodo(todoToAdd.getTodo().id);
         localStorage.setItem(`project-${projectToBeAddedto.getProject().id}`, JSON.stringify(projectToBeAddedto.getProject()));
     }
 
-    // NEED TODO IN STORAGE TO KNOW ABOUT THIS
+    // SUBSCRIBE TO MEDIATOR
     const removeTodoFromProject = (todoToRemove, projectToRemoveFrom) => {
         projectToRemoveFrom.removeTodo(todoToRemove.getTodo().id);
         localStorage.setItem(`project-${projectToRemoveFrom.getProject().id}`, JSON.stringify(projectToRemoveFrom.getProject()));
     }
 
-    // NEED TODOS IN STORAGE TO KNOW ABOUT THIS
+    // TODO'S DON'T NEED TO KNOW ABOUT THIS
+    // AS PROJECTS ARE ALWAYS CREATED EMPTY
     const createAndSaveProject = (id, title) => {
         // Don't allow duplicate id's
         if (localStorage.getItem(`project-${id}`)) {
@@ -51,12 +55,13 @@ function createProjectManager(todoManager) {
         return newProject;
     }
 
+    // TODO'S DON'T NEED TO KNOW ABOUT THIS
     const editProjectTitle = (projectToEdit, title) => {
         projectToEdit.setTitle(title);
         localStorage.setItem(`project-${projectToEdit.getProject().id}`, JSON.stringify(projectToEdit.getProject())); 
     }
 
-    // NEED TODOS IN STORAGE TO KNOW ABOUT THIS
+    // PUBLISH TO MEDIATOR
     const deleteProject = (projectToDelete) => {
         localStorage.removeItem(`project-${projectToDelete.getProject().id}`);
         

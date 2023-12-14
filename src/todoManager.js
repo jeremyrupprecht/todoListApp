@@ -1,11 +1,16 @@
 import { createTodo } from "./todo";
+// import { PubSub } from 'pubsub-js';
+
+// const subscription1 = PubSub.subscribe('topic1', data => console.log('Subscriber 1:', data));
 
 function createTodoManager(projectManager) {
 
+    // PROEJCTS DON'T NEED TO KNOW ABOUT THIS
     const getAllTodos = () => {
 
     }
 
+    // PUBLISH TO MEDIATOR
     const createAndSaveTodo = (id, title, details, dueDate, priority, isFinished, parentProjectId) => {
         // Don't allow duplicate id's
         if (localStorage.getItem(`todo-${id}`)) {
@@ -22,6 +27,7 @@ function createTodoManager(projectManager) {
         localStorage.setItem(`todo-${todoToEdit.getTodo().id}`, JSON.stringify(todoToEdit.getTodo())); 
     }
 
+    // PUBLISH TO MEDIATOR
     const deleteTodo = (todoToDelete) => {
         if (localStorage.getItem(`todo-${todoToDelete.getTodo().id}`)) {
             localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
