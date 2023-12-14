@@ -1,8 +1,8 @@
-function createProject(inputedId, title) {
+function createProject(inputedId, title, todoIds) {
     const project = Object.create(projectPrototype);
     project.id = inputedId;
     project.title = title;
-    project.todoIds = [];
+    project.todoIds = todoIds;
     return project;
 }
 

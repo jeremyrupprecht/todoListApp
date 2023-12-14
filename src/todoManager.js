@@ -1,9 +1,7 @@
 import { createTodo } from "./todo";
-// import { PubSub } from 'pubsub-js';
+import { PubSub } from 'pubsub-js';
 
-// const subscription1 = PubSub.subscribe('topic1', data => console.log('Subscriber 1:', data));
-
-function createTodoManager(projectManager) {
+function createTodoManager() {
 
     // PROEJCTS DON'T NEED TO KNOW ABOUT THIS
     const getAllTodos = () => {
@@ -19,6 +17,12 @@ function createTodoManager(projectManager) {
         }
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished, parentProjectId);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
+
+        // Publish todo creation to project manager
+        // console.log('CREATING TODO AND PUBLISHING:', newTodo);
+        PubSub.publish('createTodo', newTodo);
+
+
         return newTodo;
     }
 
@@ -29,17 +33,27 @@ function createTodoManager(projectManager) {
 
     // PUBLISH TO MEDIATOR
     const deleteTodo = (todoToDelete) => {
-        if (localStorage.getItem(`todo-${todoToDelete.getTodo().id}`)) {
-            localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
-            // Remove todo id reference from this todo's parent project (if it has one)
-            const parentProjectId = todoToDelete.getTodo().parentProjectId;
+        // if (localStorage.getItem(`todo-${todoToDelete.getTodo().id}`)) {
+        //     localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
 
-            if (parentProjectId) {
-                const projectToRemoveFrom = projectManager.getProjectFromStorage(parentProjectId);
-                projectManager.removeTodoFromProject(todoToDelete, projectToRemoveFrom);
-            } 
-        }
+        //     // Publish todo creation to project manager
+        //     const parentProjectId = todoToDelete.getTodo().parentProjectId;
+
+        //     if (parentProjectId) {
+        //         const projectToRemoveFrom = projectManager.getProjectFromStorage(parentProjectId);
+        //         projectManager.removeTodoFromProject(todoToDelete, projectToRemoveFrom);
+        //     } 
+        // }
     } 
+
+    const deleteAllTodosForThisProject = (topicName, project) => {
+        
+        console.log('PROJECT DELETED!', project.testId);
+    }
+
+    // Subscribe to / listen for project deletion events --> need to delete all
+    // todos associated with the deleted project
+    const listenForDeletedProjects = PubSub.subscribe('deleteProject', deleteAllTodosForThisProject);
 
     return {getAllTodos, createAndSaveTodo, editTodo, deleteTodo}
 }

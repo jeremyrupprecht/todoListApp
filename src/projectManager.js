@@ -1,8 +1,15 @@
 import { createProject } from "./project";
+import { PubSub } from 'pubsub-js';
+
+// const subscription1 = PubSub.subscribe('topic1', (data, msg) => console.log('Subscriber 1:', data, msg));
+// const subscription2 = PubSub.subscribe('topic1', (data, msg)  => console.log('Subscriber 2:', data, msg));
+// PubSub.publishSync('topic1', 'Hello, subscribers!');
+// PubSub.unsubscribe(subscription1);
+// PubSub.publishSync('topic1', 'Hello again!');
+
 
 function createProjectManager(todoManager) {
 
-    // TODO'S DON'T NEED TO KNOW ABOUT THIS
     const getProjectFromStorage = (id) => {
         const projectValues = JSON.parse(localStorage.getItem(`project-${id}`));
         if (projectValues) {
@@ -12,7 +19,6 @@ function createProjectManager(todoManager) {
         }
     }
 
-    // TODO'S DON'T NEED TO KNOW ABOUT THIS
     const getTodosOfThisProject = (project) => {
         const todoIds = project.getProject().todoIds;
         const todosToReturn = [];
@@ -25,37 +31,36 @@ function createProjectManager(todoManager) {
         return todosToReturn;
     }
 
-    // TODO'S DON'T NEED TO KNOW ABOUT THIS
     const getTodosDueAtThisDate = (date) => {
 
     }
 
-    // SUBSCRIBE TO MEDIATOR 
-    const addTodoToProject = (todoToAdd, projectToBeAddedto) => {
+    const addTodoToProject = (topicName, todoToAdd) => {
+        const projectToBeAddedto = getProjectFromStorage(todoToAdd.getTodo().parentProjectId);
         projectToBeAddedto.addTodo(todoToAdd.getTodo().id);
         localStorage.setItem(`project-${projectToBeAddedto.getProject().id}`, JSON.stringify(projectToBeAddedto.getProject()));
     }
+    
+    const removeTodoFromProject = (topicName, todoToRemove, idOfProjectToRemoveFrom) => {
 
-    // SUBSCRIBE TO MEDIATOR
-    const removeTodoFromProject = (todoToRemove, projectToRemoveFrom) => {
-        projectToRemoveFrom.removeTodo(todoToRemove.getTodo().id);
-        localStorage.setItem(`project-${projectToRemoveFrom.getProject().id}`, JSON.stringify(projectToRemoveFrom.getProject()));
+        // CALL GET PROJECT FROM STORAGE
+
+        // projectToRemoveFrom.removeTodo(todoToRemove.getTodo().id);
+        // localStorage.setItem(`project-${projectToRemoveFrom.getProject().id}`, JSON.stringify(projectToRemoveFrom.getProject()));
     }
 
-    // TODO'S DON'T NEED TO KNOW ABOUT THIS
-    // AS PROJECTS ARE ALWAYS CREATED EMPTY
-    const createAndSaveProject = (id, title) => {
+
+    const createAndSaveProject = (id, title, todoIds) => {
         // Don't allow duplicate id's
         if (localStorage.getItem(`project-${id}`)) {
             console.log("A Project with that id already exists!");
             return
         }
-        const newProject = createProject(id, title);
+        const newProject = createProject(id, title, todoIds);
         localStorage.setItem(`project-${id}`, JSON.stringify(newProject.getProject()));
         return newProject;
     }
 
-    // TODO'S DON'T NEED TO KNOW ABOUT THIS
     const editProjectTitle = (projectToEdit, title) => {
         projectToEdit.setTitle(title);
         localStorage.setItem(`project-${projectToEdit.getProject().id}`, JSON.stringify(projectToEdit.getProject())); 
@@ -66,6 +71,13 @@ function createProjectManager(todoManager) {
         localStorage.removeItem(`project-${projectToDelete.getProject().id}`);
         
     }
+
+    // Subscribe to / listen for todo creation events and todo deletion events
+    // --> as the project associated with the created or deleted todo needs to
+    // update its list of todo references (for display later)
+    const listenForCreatedTodos = PubSub.subscribe('createTodo', addTodoToProject);
+    const listenForDeletedTodos = PubSub.subscribe('deleteTodo', removeTodoFromProject);
+
 
     return {getProjectFromStorage, getTodosOfThisProject, getTodosDueAtThisDate, addTodoToProject, removeTodoFromProject, createAndSaveProject, editProjectTitle,
             deleteProject}
