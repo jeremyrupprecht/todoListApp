@@ -23,47 +23,35 @@ document.body.appendChild(component());
 
 
 localStorage.clear();
-const projectState = createProjectManager();
 const todoState = createTodoManager(projectState);
+const projectState = createProjectManager(todoState);
 const noteState = createNoteManager();
 
 let testDate = format(startOfToday(), 'yyyy/MM/dd');
 let todo1 = todoState.createAndSaveTodo(0, 'TODO 0', 'test note details', 
                                         testDate, 'low', false, "0");
+
+
+
+let newDate = format(endOfMonth(new Date(2014, 8, 2, 11, 55, 0)), 'yyyy/MM/dd');
+todoState.editTodo(todo1, 'newTitle', 'newDetails', newDate, 'high');
+
 let todo2 = todoState.createAndSaveTodo(1, 'TODO 1', 'test todo details2', 
                                         testDate, 'high', false, "0");
 
-// let todo3 = todoState.createAndSaveTodo(3, 'TODO 3', 'test todo details3', 
-//                                         testDate, 'low', false, "");
+let todo3 = todoState.createAndSaveTodo(3, 'TODO 3', 'test todo details3', 
+                                        testDate, 'low', false, "");
                                                                  
-// let todo4 = todoState.createAndSaveTodo(4, 'TODO 4', 'test todo details4', 
-//                                         testDate, 'medium', false, "");
+let todo4 = todoState.createAndSaveTodo(4, 'TODO 4', 'test todo details4', 
+                                        testDate, 'medium', false, "");
 
 
-let testProject = projectState.createAndSaveProject(0, 'The first project', []);
-
-// console.log(projectState.getTodosOfThisProject(testProject));
-
-projectState.addTodoToProject(todo1, testProject);
-
-// console.log(projectState.getTodosOfThisProject(testProject));
-
-projectState.addTodoToProject(todo2, testProject);
-
-// console.log(projectState.getTodosOfThisProject(testProject));
+let testProject = projectState.createAndSaveProject(0, 'The first project');
 
 
 
-// projectState.addTodoToProject(todo3, testProject);
-// console.log(projectState.getTodosOfThisProject(testProject));
-// projectState.addTodoToProject(todo4, testProject);
-// console.log(projectState.getTodosOfThisProject(testProject));
 
-todoState.deleteTodo(todo1);
 
-// console.log(projectState.getTodosOfThisProject(testProject));
-
-// console.log(localStorage);
 
 
 // let testProject2 = state.createAndSaveProject(0, 'The first project', [testTodo.getTodo().id]);

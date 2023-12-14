@@ -13,7 +13,6 @@ function createTodoManager(projectManager) {
             return
         }
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished, parentProjectId);
-        console.log(newTodo.getTodo().parentProjectId);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
         return newTodo;
     }
