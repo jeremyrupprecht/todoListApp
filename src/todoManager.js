@@ -11,6 +11,8 @@ function createTodoManager() {
 
     }
 
+    // -------------------------------------------------
+
     const getTodoIdsOfThisProject = (projectId) => {
         const todoIds = JSON.parse(localStorage.getItem(`project-${projectId}`)).todoIds;
         return todoIds;
@@ -30,9 +32,12 @@ function createTodoManager() {
         return newTodo;
     }
 
-    const editTodo = (todoToEdit, title, details, dueDate, priority) => {
-        todoToEdit.setTodoValues(title, details, dueDate, priority);
-        localStorage.setItem(`todo-${todoToEdit.getTodo().id}`, JSON.stringify(todoToEdit.getTodo())); 
+    const editTodo = (idOfTodoToEdit, title, details, dueDate, priority) => {
+        todoToEdit = localStorage.getItem(`todo-${idOfTodoToEdit}`);
+        if (todoToEdit) {
+            todoToEdit.setTodoValues(title, details, dueDate, priority);
+            localStorage.setItem(`todo-${idOfTodoToEdit}`, JSON.stringify(todoToEdit.getTodo())); 
+        }
     }
 
     // This publishes to the PubSub mediator
