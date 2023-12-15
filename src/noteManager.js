@@ -13,9 +13,14 @@ function createNoteManager() {
         return newNote;
     }
 
-    const editNoteTitle = (noteToEdit, title) => {
-        noteToEdit.setTitle(title);
-        localStorage.setItem(`note-${noteToEdit.getNote().id}`, JSON.stringify(noteToEdit.getNote())); 
+    const editNoteTitle = (idOfNoteToEdit, title) => {
+        const noteValues = JSON.parse(localStorage.getItem(`note-${idOfNoteToEdit}`));
+        if (noteValues) {
+            const editedNote = createNote(noteValues.id, title, noteValues.details);
+            localStorage.setItem(`note-${idOfNoteToEdit}`, JSON.stringify(editedNote.getNote())); 
+            return 
+        }
+        console.log("This note does not exist!");
     }
 
     const editNoteDetails = (noteToEdit, details) => {

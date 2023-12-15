@@ -80,5 +80,7 @@ projectState.editProjectTitle(testProject.getProject().id, "GUESS WHAT!");
 // let newDate = format(endOfMonth(new Date(2014, 8, 2, 11, 55, 0)), 'yyyy/MM/dd');
 // state.editTodo(testTodo, 'new Title!', 'new Details!', newDate, 'medium');
 
-// let testNote = noteState.createAndSaveNote(0, 'NOTEYYYY', 'Im a note!!');
-// let testNote2 = noteState.createAndSaveNote(1, 'NOTEYYYY', 'Im a note!!');
+let testNote = noteState.createAndSaveNote(0, 'NOTEYYYY', 'Im a note!!');
+let testNote2 = noteState.createAndSaveNote(1, 'NOTEYYYY', 'Im a note!!');
+
+noteState.editNoteTitle(testNote.getNote().id, "NEW NOTE TITLE");
