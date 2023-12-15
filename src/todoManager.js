@@ -28,24 +28,25 @@ function createTodoManager() {
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished, parentProjectId);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
         // Publish todo creation to project manager
-        PubSub.publishSync('createTodo', newTodo);
+        PubSub.publishSync('createTodo', id);
         return newTodo;
     }
 
     const editTodo = (idOfTodoToEdit, title, details, dueDate, priority) => {
-        todoToEdit = localStorage.getItem(`todo-${idOfTodoToEdit}`);
-        if (todoToEdit) {
-            todoToEdit.setTodoValues(title, details, dueDate, priority);
-            localStorage.setItem(`todo-${idOfTodoToEdit}`, JSON.stringify(todoToEdit.getTodo())); 
+        const todoValues = JSON.parse(localStorage.getItem(`todo-${idOfTodoToEdit}`));
+        if (todoValues) {
+            const editedTodo = createTodo(todoValues.id, title, details, dueDate, priority, 
+                                          todoValues.isFinished, todoValues.parentProjectId);
+            localStorage.setItem(`todo-${idOfTodoToEdit}`, JSON.stringify(editedTodo.getTodo())); 
         }
     }
 
     // This publishes to the PubSub mediator
     const deleteTodo = (idOfTodoToDelete) => {
         if (localStorage.getItem(`todo-${idOfTodoToDelete}`)) {
-            localStorage.removeItem(`todo-${idOfTodoToDelete}`);
             // Publish todo deletion to project manager
             PubSub.publishSync('deleteTodo', idOfTodoToDelete);
+            localStorage.removeItem(`todo-${idOfTodoToDelete}`);
             return
         }
         console.log('This todo does not exist!');

@@ -20,16 +20,18 @@ function createProjectManager() {
     }
 
     // Called WHENEVER a todo is created (every todo must have a parent project)
-    const addTodoToProject = (topicName, todoToAdd) => {
-        const projectToBeAddedto = getProjectFromStorage(todoToAdd.getTodo().parentProjectId);
-        projectToBeAddedto.addTodo(todoToAdd.getTodo().id);
+    const addTodoToProject = (topicName, idOfTodoToAdd) => {
+        const todoToAdd = JSON.parse(localStorage.getItem(`todo-${idOfTodoToAdd}`));
+        const projectToBeAddedto = getProjectFromStorage(todoToAdd.parentProjectId);
+        projectToBeAddedto.addTodo(todoToAdd.id);
         localStorage.setItem(`project-${projectToBeAddedto.getProject().id}`, JSON.stringify(projectToBeAddedto.getProject()));
     }
     
     // Called WHENEVER a todo is deleted (the parent's todo is reference must be deleted)
-    const removeTodoFromProject = (topicName, todoToRemove) => {
-        const projectToBeRemovedFrom = getProjectFromStorage(todoToRemove.getTodo().parentProjectId);
-        projectToBeRemovedFrom.removeTodo(todoToRemove.getTodo().id);
+    const removeTodoFromProject = (topicName, idOfTodoToRemove) => {
+        const todoToRemove = JSON.parse(localStorage.getItem(`todo-${idOfTodoToRemove}`));
+        const projectToBeRemovedFrom = getProjectFromStorage(todoToRemove.parentProjectId);
+        projectToBeRemovedFrom.removeTodo(todoToRemove.id);
         localStorage.setItem(`project-${projectToBeRemovedFrom.getProject().id}`, JSON.stringify(projectToBeRemovedFrom.getProject()));
     }
 

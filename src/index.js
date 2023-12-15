@@ -38,23 +38,32 @@ let testProject = projectState.createAndSaveProject(0, 'The first project', []);
 let testProject2 = projectState.createAndSaveProject(1, '2nd project', []);
 
 let testDate = format(startOfToday(), 'yyyy/MM/dd');
-let todo1 = todoState.createAndSaveTodo(0, 'TODO 0', 'test note details', 
+let todo0 = todoState.createAndSaveTodo(0, 'TODO 0', 'test note details', 
                                         testDate, 'low', false, 0);
 
 let newDate = format(endOfMonth(new Date(2014, 8, 2, 11, 55, 0)), 'yyyy/MM/dd');
 // todoState.editTodo(todo1, 'newTitle', 'newDetails', newDate, 'high');
 
-let todo2 = todoState.createAndSaveTodo(1, 'TODO 2', 'test todo details2', 
+let todo1 = todoState.createAndSaveTodo(1, 'TODO 1', 'test todo details2', 
                                         testDate, 'high', false, 0);
 
-let todo3 = todoState.createAndSaveTodo(3, 'TODO 3', 'test todo details3', 
+let todo2 = todoState.createAndSaveTodo(2, 'TODO 2', 'test todo details3', 
                                         testDate, 'low', false, 0);
                                                                  
-let todo4 = todoState.createAndSaveTodo(4, 'TODO 4', 'test todo details4', 
+let todo3 = todoState.createAndSaveTodo(3, 'TODO 3', 'test todo details4', 
                                         testDate, 'medium', false, 0);
 
-let todo5 = todoState.createAndSaveTodo(5, 'TODO 5', 'test todo details5', 
+let todo4 = todoState.createAndSaveTodo(4, 'TODO 4', 'test todo details5', 
                                         testDate, 'low', false, 1);
+
+
+todoState.deleteTodo(todo0.getTodo().id);
+// todoState.deleteTodo(todo1.getTodo().id);
+// todoState.deleteTodo(todo2.getTodo().id);
+// todoState.deleteTodo(todo3.getTodo().id);
+// todoState.deleteTodo(todo4.getTodo().id);
+
+todoState.editTodo(todo1.getTodo().id, 'new Title!', 'new Details!', newDate, 'medium');
 
 // console.log(JSON.stringify(testProject.getProject()));
 // console.log(JSON.stringify(testProject));
