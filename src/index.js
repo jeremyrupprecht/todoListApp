@@ -61,9 +61,12 @@ todoState.deleteTodo(todo0.getTodo().id);
 // todoState.deleteTodo(todo1.getTodo().id);
 // todoState.deleteTodo(todo2.getTodo().id);
 // todoState.deleteTodo(todo3.getTodo().id);
-// todoState.deleteTodo(todo4.getTodo().id);
+todoState.deleteTodo(todo4.getTodo().id);
 
 todoState.editTodo(todo1.getTodo().id, 'new Title!', 'new Details!', newDate, 'medium');
+
+projectState.editProjectTitle(testProject2.getProject().id, "NEW PROJECT TITLE!");
+projectState.editProjectTitle(testProject.getProject().id, "GUESS WHAT!");
 
 // console.log(JSON.stringify(testProject.getProject()));
 // console.log(JSON.stringify(testProject));

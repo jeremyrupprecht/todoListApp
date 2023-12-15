@@ -46,7 +46,8 @@ function createProjectManager() {
         return newProject;
     }
 
-    const editProjectTitle = (projectToEdit, title) => {
+    const editProjectTitle = (idOfProjectToEdit, title) => {
+        const projectToEdit = getProjectFromStorage(idOfProjectToEdit);
         projectToEdit.setTitle(title);
         localStorage.setItem(`project-${projectToEdit.getProject().id}`, JSON.stringify(projectToEdit.getProject())); 
     }
