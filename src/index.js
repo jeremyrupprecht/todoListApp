@@ -84,3 +84,4 @@ let testNote = noteState.createAndSaveNote(0, 'NOTEYYYY', 'Im a note!!');
 let testNote2 = noteState.createAndSaveNote(1, 'NOTEYYYY', 'Im a note!!');
 
 noteState.editNoteTitle(testNote.getNote().id, "NEW NOTE TITLE");
+noteState.editNoteDetails(testNote2.getNote().id, "GUESS WHAT, NEW NOTE DETAILS!!!");
