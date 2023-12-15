@@ -3,9 +3,17 @@ import { PubSub } from 'pubsub-js';
 
 function createTodoManager() {
 
-    // PROEJCTS DON'T NEED TO KNOW ABOUT THIS
     const getAllTodos = () => {
 
+    }
+
+    const getAllTodosDueAtThisDate = (date) => {
+
+    }
+
+    const getTodoIdsOfThisProject = (projectId) => {
+        const todoIds = JSON.parse(localStorage.getItem(`project-${projectId}`)).todoIds;
+        return todoIds;
     }
 
     // This publishes to the PubSub mediator
@@ -18,7 +26,7 @@ function createTodoManager() {
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished, parentProjectId);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
         // Publish todo creation to project manager
-        PubSub.publish('createTodo', newTodo);
+        PubSub.publishSync('createTodo', newTodo);
         return newTodo;
     }
 
@@ -28,26 +36,30 @@ function createTodoManager() {
     }
 
     // This publishes to the PubSub mediator
-    const deleteTodo = (todoToDelete) => {
-        if (localStorage.getItem(`todo-${todoToDelete.getTodo().id}`)) {
-            localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
+    const deleteTodo = (idOfTodoToDelete) => {
+        if (localStorage.getItem(`todo-${idOfTodoToDelete}`)) {
+            localStorage.removeItem(`todo-${idOfTodoToDelete}`);
             // Publish todo deletion to project manager
-            PubSub.publish('deleteTodo', todoToDelete);
+            PubSub.publishSync('deleteTodo', idOfTodoToDelete);
             return
         }
         console.log('This todo does not exist!');
     } 
 
-    const deleteAllTodosForThisProject = (topicName, project) => {
-        
-        console.log('PROJECT DELETED!', project.testId);
+    // Called WHENEVER a project is deleted --> all of it's todos are deleted as well
+    const deleteAllTodosForThisProject = (topicName, projectId) => {
+        const todoIds = getTodoIdsOfThisProject(projectId);
+        for (let i = 0; i < todoIds.length; i++) {
+            localStorage.removeItem(`todo-${todoIds[i]}`);
+        }
+
     }
 
     // Subscribe to / listen for project deletion events --> need to delete all
     // todos associated with the deleted project
     const listenForDeletedProjects = PubSub.subscribe('deleteProject', deleteAllTodosForThisProject);
 
-    return {getAllTodos, createAndSaveTodo, editTodo, deleteTodo}
+    return {getAllTodos, getAllTodosDueAtThisDate, getTodoIdsOfThisProject, createAndSaveTodo, editTodo, deleteTodo}
 }
 
 export { createTodoManager }
