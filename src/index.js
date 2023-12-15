@@ -37,8 +37,8 @@ const noteState = createNoteManager();
 let testProject = projectState.createAndSaveProject(0, 'The first project', []);
 
 let testDate = format(startOfToday(), 'yyyy/MM/dd');
-let todo1 = todoState.createAndSaveTodo(0, 'TODO 0', 'test note details', 
-                                        testDate, 'low', false, 0);
+// let todo1 = todoState.createAndSaveTodo(0, 'TODO 0', 'test note details', 
+//                                         testDate, 'low', false, 0);
 
 let newDate = format(endOfMonth(new Date(2014, 8, 2, 11, 55, 0)), 'yyyy/MM/dd');
 // todoState.editTodo(todo1, 'newTitle', 'newDetails', newDate, 'high');
@@ -46,11 +46,14 @@ let newDate = format(endOfMonth(new Date(2014, 8, 2, 11, 55, 0)), 'yyyy/MM/dd');
 let todo2 = todoState.createAndSaveTodo(1, 'TODO 2', 'test todo details2', 
                                         testDate, 'high', false, 0);
 
-let todo3 = todoState.createAndSaveTodo(3, 'TODO 3', 'test todo details3', 
-                                        testDate, 'low', false, 0);
+// let todo3 = todoState.createAndSaveTodo(3, 'TODO 3', 'test todo details3', 
+//                                         testDate, 'low', false, 0);
                                                                  
 let todo4 = todoState.createAndSaveTodo(4, 'TODO 4', 'test todo details4', 
                                         testDate, 'medium', false, 0);
+
+
+todoState.deleteTodo(todo4);
 
 
 // let testProject2 = state.createAndSaveProject(0, 'The first project', [testTodo.getTodo().id]);

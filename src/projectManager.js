@@ -7,7 +7,6 @@ import { PubSub } from 'pubsub-js';
 // PubSub.unsubscribe(subscription1);
 // PubSub.publishSync('topic1', 'Hello again!');
 
-
 function createProjectManager(todoManager) {
 
     const getProjectFromStorage = (id) => {
@@ -17,6 +16,7 @@ function createProjectManager(todoManager) {
                                     projectValues.title, projectValues.todoIds);
             return projectToReturn;
         }
+        console.log("Project does not Exist!");
     }
 
     const getTodosOfThisProject = (project) => {
@@ -35,18 +35,18 @@ function createProjectManager(todoManager) {
 
     }
 
+    // Called WHENEVER a todo is created (every todo must have a parent project)
     const addTodoToProject = (topicName, todoToAdd) => {
         const projectToBeAddedto = getProjectFromStorage(todoToAdd.getTodo().parentProjectId);
         projectToBeAddedto.addTodo(todoToAdd.getTodo().id);
         localStorage.setItem(`project-${projectToBeAddedto.getProject().id}`, JSON.stringify(projectToBeAddedto.getProject()));
     }
     
-    const removeTodoFromProject = (topicName, todoToRemove, idOfProjectToRemoveFrom) => {
-
-        // CALL GET PROJECT FROM STORAGE
-
-        // projectToRemoveFrom.removeTodo(todoToRemove.getTodo().id);
-        // localStorage.setItem(`project-${projectToRemoveFrom.getProject().id}`, JSON.stringify(projectToRemoveFrom.getProject()));
+    // Called WHENEVER a todo is deleted (the parent's todo is reference must be deleated)
+    const removeTodoFromProject = (topicName, todoToRemove) => {
+        const projectToBeRemovedFrom = getProjectFromStorage(todoToRemove.getTodo().parentProjectId);
+        projectToBeRemovedFrom.removeTodo(todoToRemove.getTodo().id);
+        localStorage.setItem(`project-${projectToBeRemovedFrom.getProject().id}`, JSON.stringify(projectToBeRemovedFrom.getProject()));
     }
 
 
@@ -66,7 +66,7 @@ function createProjectManager(todoManager) {
         localStorage.setItem(`project-${projectToEdit.getProject().id}`, JSON.stringify(projectToEdit.getProject())); 
     }
 
-    // PUBLISH TO MEDIATOR
+    // This publishes to the PubSub mediator
     const deleteProject = (projectToDelete) => {
         localStorage.removeItem(`project-${projectToDelete.getProject().id}`);
         
@@ -77,7 +77,6 @@ function createProjectManager(todoManager) {
     // update its list of todo references (for display later)
     const listenForCreatedTodos = PubSub.subscribe('createTodo', addTodoToProject);
     const listenForDeletedTodos = PubSub.subscribe('deleteTodo', removeTodoFromProject);
-
 
     return {getProjectFromStorage, getTodosOfThisProject, getTodosDueAtThisDate, addTodoToProject, removeTodoFromProject, createAndSaveProject, editProjectTitle,
             deleteProject}

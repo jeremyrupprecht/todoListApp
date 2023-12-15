@@ -8,7 +8,7 @@ function createTodoManager() {
 
     }
 
-    // PUBLISH TO MEDIATOR
+    // This publishes to the PubSub mediator
     const createAndSaveTodo = (id, title, details, dueDate, priority, isFinished, parentProjectId) => {
         // Don't allow duplicate id's
         if (localStorage.getItem(`todo-${id}`)) {
@@ -17,12 +17,8 @@ function createTodoManager() {
         }
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished, parentProjectId);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
-
         // Publish todo creation to project manager
-        // console.log('CREATING TODO AND PUBLISHING:', newTodo);
         PubSub.publish('createTodo', newTodo);
-
-
         return newTodo;
     }
 
@@ -31,19 +27,15 @@ function createTodoManager() {
         localStorage.setItem(`todo-${todoToEdit.getTodo().id}`, JSON.stringify(todoToEdit.getTodo())); 
     }
 
-    // PUBLISH TO MEDIATOR
+    // This publishes to the PubSub mediator
     const deleteTodo = (todoToDelete) => {
-        // if (localStorage.getItem(`todo-${todoToDelete.getTodo().id}`)) {
-        //     localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
-
-        //     // Publish todo creation to project manager
-        //     const parentProjectId = todoToDelete.getTodo().parentProjectId;
-
-        //     if (parentProjectId) {
-        //         const projectToRemoveFrom = projectManager.getProjectFromStorage(parentProjectId);
-        //         projectManager.removeTodoFromProject(todoToDelete, projectToRemoveFrom);
-        //     } 
-        // }
+        if (localStorage.getItem(`todo-${todoToDelete.getTodo().id}`)) {
+            localStorage.removeItem(`todo-${todoToDelete.getTodo().id}`);
+            // Publish todo deletion to project manager
+            PubSub.publish('deleteTodo', todoToDelete);
+            return
+        }
+        console.log('This todo does not exist!');
     } 
 
     const deleteAllTodosForThisProject = (topicName, project) => {
