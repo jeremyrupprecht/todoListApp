@@ -1,26 +1,34 @@
 import './style.css';
-import Icon from './testIcon.png';
+import background from './images/background.png';
 import {endOfMonth, format, startOfDay, startOfToday} from 'date-fns';
 import { createTodoManager } from './todoManager';
 import { createProjectManager } from './projectManager';
 import { createNoteManager } from './noteManager';
-import { parseISO } from 'date-fns';
+import { renderScreen } from './domManager';
 
-function component() {
-    const element = document.createElement('div');
+// function component() {
+//     const element = document.createElement('div');
 
-    element.innerHTML = "testing..........";
-    element.classList.add('hello');
+//     element.innerHTML = "testing..........";
+//     element.classList.add('hello');
 
-    // Add the image to our existing div.
-    const myIcon = new Image();
-    myIcon.src = Icon;
-    element.appendChild(myIcon);
+//     // Add the image to our existing div.
+//     const Background = new Image();
+//     Background.src = background;
+//     element.appendChild(Background);
 
-    return element;
-}
+//     return element;
+// }
 
-document.body.appendChild(component());
+// document.body.appendChild(component());
+
+
+renderScreen();
+
+
+
+
+// Testing functions.......................
 
 // const subscription1 = PubSub.subscribe('topic1', (data, msg) => console.log('Subscriber 1:', data, msg));
 // const subscription2 = PubSub.subscribe('topic1', (data, msg)  => console.log('Subscriber 2:', data, msg));
@@ -32,8 +40,6 @@ localStorage.clear();
 const todoState = createTodoManager();
 const projectState = createProjectManager();
 const noteState = createNoteManager();
-
-
 
 let testProject = projectState.createAndSaveProject(0, 'The first project', []);
 let testProject2 = projectState.createAndSaveProject(1, '2nd project', []);
