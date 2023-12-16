@@ -1,12 +1,6 @@
 import { createProject } from "./project";
 import { PubSub } from 'pubsub-js';
 
-// const subscription1 = PubSub.subscribe('topic1', (data, msg) => console.log('Subscriber 1:', data, msg));
-// const subscription2 = PubSub.subscribe('topic1', (data, msg)  => console.log('Subscriber 2:', data, msg));
-// PubSub.publishSync('topic1', 'Hello, subscribers!');
-// PubSub.unsubscribe(subscription1);
-// PubSub.publishSync('topic1', 'Hello again!');
-
 function createProjectManager() {
 
     const getProjectFromStorage = (id) => {

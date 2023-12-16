@@ -88,14 +88,11 @@ noteState.editNoteTitle(testNote.getNote().id, "NEW NOTE TITLE");
 noteState.editNoteDetails(testNote2.getNote().id, "GUESS WHAT, NEW NOTE DETAILS!!!");
 noteState.deleteNote(testNote.getNote().id);
 
-
 // console.log(todoState.getAllTodos());
 
 let today = format(startOfToday(), 'yyyy-MM-dd');
 
 let testDate2 = format(new Date(1995, 0, 15), 'yyyy-MM-dd');
 
-
-
 const todosDate = todoState.getAllTodosDueBeforeThisDate(testDate2);
-console.table('RETURNED DATES', todosDate);
+// console.table('RETURNED DATES', todosDate);

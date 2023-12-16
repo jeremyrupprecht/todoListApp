@@ -16,15 +16,15 @@ const todoPrototype = {
                 dueDate: this.dueDate, priority: this.priority,
                 isFinished: this.isFinished, parentProjectId: this.parentProjectId}
     },
-    setTodoValues: function(title, details, dueDate, priority) {
-        this.title = title;
-        this.details = details;
-        this.dueDate = dueDate;
-        this.priority = priority;
-    },
-    setIsFinished: function(newBool) {
-        this.isFinished = newBool;
-    },
+    // setTodoValues: function(title, details, dueDate, priority) {
+    //     this.title = title;
+    //     this.details = details;
+    //     this.dueDate = dueDate;
+    //     this.priority = priority;
+    // },
+    // setIsFinished: function(newBool) {
+    //     this.isFinished = newBool;
+    // },
 }
 
 export { createTodo }
