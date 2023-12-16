@@ -4,7 +4,14 @@ import { PubSub } from 'pubsub-js';
 function createTodoManager() {
 
     const getAllTodos = () => {
-
+        const allTodos = []
+        const keys = Object.keys(localStorage);
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i].includes("todo")) {
+                allTodos.push(localStorage.getItem(keys[i]));
+            }
+        }
+        return allTodos;
     }
 
     const getAllTodosDueAtThisDate = (date) => {

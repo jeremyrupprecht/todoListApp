@@ -57,10 +57,10 @@ let todo4 = todoState.createAndSaveTodo(4, 'TODO 4', 'test todo details5',
                                         testDate, 'low', false, 1);
 
 
-todoState.deleteTodo(todo0.getTodo().id);
-// todoState.deleteTodo(todo1.getTodo().id);
+// todoState.deleteTodo(todo0.getTodo().id);
+todoState.deleteTodo(todo1.getTodo().id);
 // todoState.deleteTodo(todo2.getTodo().id);
-// todoState.deleteTodo(todo3.getTodo().id);
+todoState.deleteTodo(todo3.getTodo().id);
 // todoState.deleteTodo(todo4.getTodo().id);
 
 todoState.editTodo(todo1.getTodo().id, 'new Title!', 'new Details!', newDate, 'medium');
@@ -86,3 +86,6 @@ let testNote2 = noteState.createAndSaveNote(1, 'NOTEYYYY', 'Im a note!!');
 noteState.editNoteTitle(testNote.getNote().id, "NEW NOTE TITLE");
 noteState.editNoteDetails(testNote2.getNote().id, "GUESS WHAT, NEW NOTE DETAILS!!!");
 noteState.deleteNote(testNote.getNote().id);
+
+
+console.log(todoState.getAllTodos());
