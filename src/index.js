@@ -4,6 +4,7 @@ import {endOfMonth, format, startOfDay, startOfToday} from 'date-fns';
 import { createTodoManager } from './todoManager';
 import { createProjectManager } from './projectManager';
 import { createNoteManager } from './noteManager';
+import { parseISO } from 'date-fns';
 
 function component() {
     const element = document.createElement('div');
@@ -37,18 +38,18 @@ const noteState = createNoteManager();
 let testProject = projectState.createAndSaveProject(0, 'The first project', []);
 let testProject2 = projectState.createAndSaveProject(1, '2nd project', []);
 
-let testDate = format(startOfToday(), 'yyyy/MM/dd');
+let testDate = format(new Date(1995, 0, 14), 'yyyy-MM-dd');
 let todo0 = todoState.createAndSaveTodo(0, 'TODO 0', 'test note details', 
                                         testDate, 'low', false, 0);
 
-let newDate = format(endOfMonth(new Date(2014, 8, 2, 11, 55, 0)), 'yyyy/MM/dd');
+let newDate = format(new Date(1995, 0, 16), 'yyyy-MM-dd');
 // todoState.editTodo(todo1, 'newTitle', 'newDetails', newDate, 'high');
 
 let todo1 = todoState.createAndSaveTodo(1, 'TODO 1', 'test todo details2', 
                                         testDate, 'high', false, 0);
 
 let todo2 = todoState.createAndSaveTodo(2, 'TODO 2', 'test todo details3', 
-                                        testDate, 'low', false, 0);
+                                        newDate, 'low', false, 0);
                                                                  
 let todo3 = todoState.createAndSaveTodo(3, 'TODO 3', 'test todo details4', 
                                         testDate, 'medium', false, 0);
@@ -58,9 +59,9 @@ let todo4 = todoState.createAndSaveTodo(4, 'TODO 4', 'test todo details5',
 
 
 // todoState.deleteTodo(todo0.getTodo().id);
-todoState.deleteTodo(todo1.getTodo().id);
+// todoState.deleteTodo(todo1.getTodo().id);
 // todoState.deleteTodo(todo2.getTodo().id);
-todoState.deleteTodo(todo3.getTodo().id);
+// todoState.deleteTodo(todo3.getTodo().id);
 // todoState.deleteTodo(todo4.getTodo().id);
 
 todoState.editTodo(todo1.getTodo().id, 'new Title!', 'new Details!', newDate, 'medium');
@@ -88,4 +89,13 @@ noteState.editNoteDetails(testNote2.getNote().id, "GUESS WHAT, NEW NOTE DETAILS!
 noteState.deleteNote(testNote.getNote().id);
 
 
-console.log(todoState.getAllTodos());
+// console.log(todoState.getAllTodos());
+
+let today = format(startOfToday(), 'yyyy-MM-dd');
+
+let testDate2 = format(new Date(1995, 0, 15), 'yyyy-MM-dd');
+
+
+
+const todosDate = todoState.getAllTodosDueBeforeThisDate(testDate2);
+console.table('RETURNED DATES', todosDate);

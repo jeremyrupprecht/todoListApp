@@ -1,5 +1,7 @@
+import { compareAsc } from "date-fns";
 import { createTodo } from "./todo";
 import { PubSub } from 'pubsub-js';
+import { parseISO } from 'date-fns';
 
 function createTodoManager() {
 
@@ -8,18 +10,19 @@ function createTodoManager() {
         const keys = Object.keys(localStorage);
         for (let i = 0; i < keys.length; i++) {
             if (keys[i].includes("todo")) {
-                allTodos.push(localStorage.getItem(keys[i]));
+                allTodos.push(JSON.parse(localStorage.getItem(keys[i])));
             }
         }
         return allTodos;
     }
 
-    const getAllTodosDueAtThisDate = (date) => {
-
+    const getAllTodosDueBeforeThisDate = (date) => {
+        const allTodos = getAllTodos();
+        const todosBeforeThisDate = allTodos.filter((todo) => 
+        parseISO(todo.dueDate).getTime() <= parseISO(date).getTime());
+        return todosBeforeThisDate;
     }
-
-    // -------------------------------------------------
-
+    
     const getTodoIdsOfThisProject = (projectId) => {
         const todoIds = JSON.parse(localStorage.getItem(`project-${projectId}`)).todoIds;
         return todoIds;
@@ -71,7 +74,7 @@ function createTodoManager() {
     // todos associated with the deleted project
     const listenForDeletedProjects = PubSub.subscribe('deleteProject', deleteAllTodosForThisProject);
 
-    return {getAllTodos, getAllTodosDueAtThisDate, getTodoIdsOfThisProject, createAndSaveTodo, editTodo, deleteTodo}
+    return {getAllTodos, getAllTodosDueBeforeThisDate, getTodoIdsOfThisProject, createAndSaveTodo, editTodo, deleteTodo}
 }
 
 export { createTodoManager }
