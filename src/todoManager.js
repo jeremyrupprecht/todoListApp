@@ -58,7 +58,6 @@ function createTodoManager() {
         for (let i = 0; i < todoIds.length; i++) {
             localStorage.removeItem(`todo-${todoIds[i]}`);
         }
-
     }
 
     // Subscribe to / listen for project deletion events --> need to delete all

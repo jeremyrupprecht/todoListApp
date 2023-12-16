@@ -33,8 +33,8 @@ function createNoteManager() {
         console.log("This note does not exist!");
     }
 
-    const deleteNote = (noteToDelete) => {
-        localStorage.removeItem(`note-${noteToDelete.getNote().id}`);
+    const deleteNote = (idOfNoteToDelete) => {
+        localStorage.removeItem(`note-${idOfNoteToDelete}`);
     }
 
     return { createAndSaveNote, editNoteTitle, editNoteDetails, deleteNote}
