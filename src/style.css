@@ -25,6 +25,11 @@ html, body, #content, .backgroundImg {
     align-items: center;
 }
 
+button {
+    border: none;
+    cursor: pointer;    
+}
+
 .backgroundImg {
     position: absolute;
     top: 0;
@@ -44,20 +49,172 @@ html, body, #content, .backgroundImg {
     grid-area: 1 / 1 / 2 / 3;
     background-color: var(--darkBlack);
     border-radius: 15px 15px 0px 0px;
+    display: flex;
+    align-items: center;
 }
 
 .topBar > p {
-    margin: 10px;
+    margin-left: 50px;
+    font-size: 2.3rem;
 }
 
 .sideBar {
     grid-area: 2 / 1 / 3 / 2;
     background-color: var(--lightBlack);
     border-radius: 0px 0px 0px 15px;
+
+    display: flex;
+    flex-direction: column;
+    padding: 50px;
+    gap: 20px;
+
 }
+
+
+.sideBar > div > p {
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.sideBar > div {
+    display: flex;
+    /* border: 1px solid white; */
+}
+
+.numberOfTodos {
+    margin-left: auto;
+    height: 1.6rem;
+    width: 1.6rem;
+    border-radius: 15px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+}
+
+/* .numberOfTodos > p {
+
+} */
 
 .mainSection {
     grid-area: 2 / 2 / 3 / 3;
     background-color: var(--mediumBlack);
     border-radius: 0px 0px 15px 0px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+::-webkit-scrollbar {
+    width: 13px;
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--darkBlack);
+    border-radius: 5px;
+}
+
+.todoContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 0px 20px 0px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+}
+
+.todoItem {
+    background-color: var(--darkBlack);
+    height: 50px;
+    width: 95%;
+    border-radius: 10px;
+
+    display: flex;
+}
+
+.todoLeft, .todoRight {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.todoRight {
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.todoPriority {
+    background-color: green;
+    height: 50px;
+    width: 10px;
+    border-radius: 10px 0px 0px 10px;
+}
+
+input[type="checkbox"], .todoDetails {
+    cursor: pointer;
+}
+
+input[type="checkbox"] {
+    height: 18px;
+    width: 18px;
+}
+
+.todoDetails {
+    border: 1px solid white;
+    padding: 2px 4px 2px 4px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.todoButton {
+    height: 24px;
+    width: 24px;
+    background: none;
+    margin-bottom: 4px;
+}
+
+.titleFinished, .dueDateFinished, .buttonFinished, .detailsFinished {
+    color: rgb(163, 163, 163);
+}
+
+.detailsFinished {
+    border: 1px solid rgb(163, 163, 163);
+}
+
+.titleFinished {
+    text-decoration: line-through;
+}
+
+.todoFooter {
+    height: 60px;
+    padding: 15px 20px 15px 20px;
+    
+    display: flex;
+    gap: 10px;
+}
+
+.footerRight {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+}
+
+.footerButton {
+    height: 50px;
+    width: 50px;
+    background: none;
+}
+
+@media only screen and (max-width: 1280px) {
+    .centerContainerGrid {
+        height: 100vh;
+    }
+
+    .topBar, .sideBar, .mainSection {
+        border-radius: 0px;
+    }
 }
