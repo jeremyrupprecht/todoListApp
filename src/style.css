@@ -209,6 +209,169 @@ input[type="checkbox"] {
     background: none;
 }
 
+.createNoteModal {
+    position: absolute;
+    background-color: var(--darkBlack);
+    height: 50%;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+}
+
+.modalTitle {
+    background-color: var(--darkBlack);
+    padding: 10px;
+    border-radius: 20px 20px 0px 0px;
+}
+
+.newNoteForm {
+    flex: 1;
+    border-radius: 0px 0px 20px 20px;
+    padding: 20px 20px 0px 20px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.formRow {
+    width: 100%;
+    /* border: 1px solid white; */
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.formRow:nth-child(3) {
+    margin-top: auto;
+}
+
+input[type="text"], textarea {
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    height: 1.5rem;
+    outline: none;
+    font-size: 1.3rem;
+}
+
+input[type="text"]::placeholder {
+    color: gray;
+    font-size: 1.3rem;
+}
+
+textarea {
+    font-size: 1.1rem;
+    resize: none;
+    flex: 1;
+}
+
+.formRow:nth-child(3) {
+    margin-bottom: 10px;
+}
+
+input[type="date"] {
+    background-color: transparent;
+    border: 1px solid white;
+    padding: 5px 5px 5px 15px;
+    border-radius: 15px;
+    margin-left: 10px;
+    color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    color: red;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+.radioContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.radioContainer > label {
+    position: absolute;
+    transform:translate(-50%,-50%);
+    top: 28px;
+}
+
+
+.radioContainer > label:nth-child(1) {
+    margin-right: 30px;
+}
+
+.radioContainer label:not(.radioContainer > label:nth-child(1)) {
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.radioContainer label:not(.radioContainer > label:nth-child(1)):hover {
+    color: white;
+}
+
+.radioContainer > label:nth-child(3) {
+    border: 1px solid green;
+    color: green;
+    padding: 4px;
+    left: 110px;
+
+}
+
+.radioContainer > label:nth-child(3):hover, #low:checked+label[for="low"]{
+    background-color: green;
+    padding: 6px;
+    color: white;
+}
+
+.radioContainer > label:nth-child(5) {
+    border: 1px solid orange;
+    color: orange;
+    padding: 4px;
+    left: 180px;
+}
+
+.radioContainer > label:nth-child(5):hover, #medium:checked+label[for="medium"] {
+    background-color: orange;
+    padding: 6px;
+    color: white;
+}
+
+.radioContainer > label:nth-child(7) {
+    border: 1px solid red;
+    color: red;
+    padding: 4px;
+    left: 252px;
+}
+
+.radioContainer > label:nth-child(7):hover, #high:checked+label[for="high"] {
+    background-color: red;
+    padding: 6px;
+    color: white;
+}
+
+.submitButtonDiv {
+    margin-left: auto;
+}
+
+.submitButtonDiv > button {
+    background-color: transparent;
+    border: 1px solid white;
+    padding: 20px;
+    border-radius: 4px;
+}
+
+.submitButtonDiv > button:hover {
+    background-color: rgba(255, 255, 255, 0.212);
+}
+
+
 @media only screen and (max-width: 1280px) {
     .centerContainerGrid {
         height: 100vh;
