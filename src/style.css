@@ -104,6 +104,10 @@ button {
 
     display: flex;
     flex-direction: column;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 100vh;
 }
 
 ::-webkit-scrollbar {
@@ -124,7 +128,9 @@ button {
     padding: 20px 0px 20px 0px;
     overflow-y: auto;
     overflow-x: hidden;
+    max-height: calc(100vh - 60px);
     flex: 1;
+    border: 1px solid white;
 }
 
 .todoItem {
@@ -222,7 +228,7 @@ input[type="checkbox"] {
 
     position: absolute;
     background-color: var(--darkBlack);
-    height: 50%;
+    height: clamp(400px, 50%, 700px);
     width: 80%;
     max-width: 800px;
     border-radius: 20px;
@@ -264,6 +270,7 @@ input[type="checkbox"] {
 
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .formRow {
@@ -296,6 +303,7 @@ textarea {
     font-size: 1.1rem;
     resize: none;
     flex: 1;
+    max-height: 160px;
 }
 
 .formRow:nth-child(3) {
