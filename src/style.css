@@ -170,6 +170,11 @@ input[type="checkbox"] {
     font-size: 0.9rem;
 }
 
+.todoDueDate {
+    width: 80px;
+    text-align: center;
+}
+
 .todoButton {
     height: 24px;
     width: 24px;
@@ -209,7 +214,11 @@ input[type="checkbox"] {
     background: none;
 }
 
-.createNoteModal {
+/* .footerButton:hover {
+    fill: rgba(255, 255, 255, 0.144);
+} */
+
+.createTodoModal {
 
     position: absolute;
     background-color: var(--darkBlack);
@@ -223,13 +232,16 @@ input[type="checkbox"] {
     z-index: 2;
 }
 
+.createTodoModal.show, .modalFullScreenOverlay.show {
+    display: flex;
+}
+
 .modalFullScreenOverlay {
     display: none;
     height: 100vh;
     width: 100vw;
     position: absolute;
-    /* background-color: rgba(0, 0, 0, 0.5); */
-    background-color: pink;
+    background-color: rgba(0, 0, 0, 0.315);
     pointer-events: none;
     z-index: 1;
 }

@@ -1,32 +1,29 @@
 import './style.css';
-import background from './images/background.png';
 import {endOfMonth, format, startOfDay, startOfToday} from 'date-fns';
 import { createTodoManager } from './todoManager';
 import { createProjectManager } from './projectManager';
 import { createNoteManager } from './noteManager';
-import { renderScreen } from './domManager';
-
-// function component() {
-//     const element = document.createElement('div');
-
-//     element.innerHTML = "testing..........";
-//     element.classList.add('hello');
-
-//     // Add the image to our existing div.
-//     const Background = new Image();
-//     Background.src = background;
-//     element.appendChild(Background);
-
-//     return element;
-// }
-
-// document.body.appendChild(component());
+import { renderScreen, setupListeners} from './domManager';
 
 
+preloadData();
 renderScreen();
+setupListeners();
 
+function preloadData() {
 
+    // Preloaded data already there
+    if (localStorage.length) {
+        return
+    }
 
+    // Need to load template data if storage is empty (like when the user
+    // first opens the site)
+
+}
+
+// const testD = format(new Date(1995, 0, 14), 'MMM Do');
+// console.log(testD);
 
 // Testing functions.......................
 
@@ -35,6 +32,7 @@ renderScreen();
 // PubSub.publishSync('topic1', 'Hello, subscribers!');
 // PubSub.unsubscribe(subscription1);
 // PubSub.publishSync('topic1', 'Hello again!');
+
 
 localStorage.clear();
 const todoState = createTodoManager();
