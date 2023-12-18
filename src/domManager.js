@@ -4,6 +4,7 @@ import trashIcon from './images/trashIcon.svg';
 import editIconGray from './images/editIconGray.svg';
 import trashIconGray from './images/trashIconGray.svg';
 import plusIcon from './images/plusIcon.svg';
+import closeIcon from './images/closeIcon.svg';
 
 function renderScreen() {
     const content = document.getElementById('content');
@@ -14,6 +15,7 @@ function renderScreen() {
 
     renderTodo();
     renderProjectFooterButtonImgs();
+    renderCreateTodoModal();
 }
 
 function renderTodo() {
@@ -45,6 +47,14 @@ function renderProjectFooterButtonImgs() {
     trashIconElement.src = trashIcon;
     deleteProjectButton.appendChild(trashIconElement);
 
+}
+
+function renderCreateTodoModal() {
+
+    const closeContainer = document.querySelector('.modalTitle');
+    const closeIconElement = new Image();
+    closeIconElement.src = closeIcon;
+    closeContainer.appendChild(closeIconElement);
 }
 
 export {renderScreen}

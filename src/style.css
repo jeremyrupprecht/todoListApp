@@ -210,6 +210,7 @@ input[type="checkbox"] {
 }
 
 .createNoteModal {
+
     position: absolute;
     background-color: var(--darkBlack);
     height: 50%;
@@ -217,15 +218,31 @@ input[type="checkbox"] {
     max-width: 800px;
     border-radius: 20px;
 
-    display: flex;
+    display: none;
     flex-direction: column;
+    z-index: 2;
+}
 
+.modalFullScreenOverlay {
+    display: none;
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    /* background-color: rgba(0, 0, 0, 0.5); */
+    background-color: pink;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .modalTitle {
     background-color: var(--darkBlack);
-    padding: 10px;
+    padding: 15px 15px 10px 15px;
     border-radius: 20px 20px 0px 0px;
+    display: flex;
+}
+
+.modalTitle img {
+    margin-left: auto;
 }
 
 .newNoteForm {
@@ -370,7 +387,6 @@ input[type="radio"] {
 .submitButtonDiv > button:hover {
     background-color: rgba(255, 255, 255, 0.212);
 }
-
 
 @media only screen and (max-width: 1280px) {
     .centerContainerGrid {
