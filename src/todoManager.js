@@ -29,7 +29,8 @@ function createTodoManager() {
     }
 
     // This publishes to the PubSub mediator
-    const createAndSaveTodo = (id, title, details, dueDate, priority, isFinished, parentProjectId) => {
+    const createAndSaveTodo = (title, details, dueDate, priority, isFinished, parentProjectId) => {
+        const id = getAllTodos().length;
         // Don't allow duplicate id's
         if (localStorage.getItem(`todo-${id}`)) {
             console.log("A Todo with that id already exists!");
@@ -70,9 +71,17 @@ function createTodoManager() {
         }
     }
 
+    const testPubSub = (topicName, todoValues) => {
+        console.log("TODOSIDE", todoValues);
+    }
+
     // Subscribe to / listen for project deletion events --> need to delete all
     // todos associated with the deleted project
     const listenForDeletedProjects = PubSub.subscribe('deleteProject', deleteAllTodosForThisProject);
+
+
+
+    const listenForCreatedTodos = PubSub.subscribe('createTodoToTodoManager', testPubSub);
 
     return {getAllTodos, getAllTodosDueBeforeThisDate, getTodoIdsOfThisProject, createAndSaveTodo, editTodo, deleteTodo}
 }

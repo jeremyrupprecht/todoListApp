@@ -6,6 +6,7 @@ import trashIconGray from './images/trashIconGray.svg';
 import plusIcon from './images/plusIcon.svg';
 import closeIcon from './images/closeIcon.svg';
 import {parse, format} from 'date-fns';
+import { PubSub } from 'pubsub-js';
 
 function renderAllImages() {
 
@@ -48,35 +49,54 @@ function renderCreateTodoModal() {
     modalOverlay.classList.add('show');
 
     const closeIconElement = document.querySelector(".closeIconImg");
-
-    closeIconElement.addEventListener('click', () => {
-        modal.classList.remove('show');
-        modalOverlay.classList.remove('show');
-    });
-
     const form = document.getElementById('newNoteForm');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        handleFormData();
+
+    function closeModal() {
         modal.classList.remove('show');
         modalOverlay.classList.remove('show');
-        form.reset();
-    });
+        closeIconElement.removeEventListener('click', closeModal);
+    }
+
+    function closeForm(e) {
+        e.preventDefault();
+        handleTodoFormData();
+        closeModal();
+        form.removeEventListener('submit', closeForm);
+    }
+
+    closeIconElement.addEventListener('click', closeModal);
+    form.addEventListener('submit', closeForm);
 }
 
 // PUT THIS IN IT'S OWN MODULE LATER?
 
-function handleFormData() {
+function handleTodoFormData() {
+    const form = document.getElementById('newNoteForm');
     const title = document.getElementById('titleInput');
     const details = document.getElementById('detailsInput');
     const dueDate = document.getElementById('dueDateInput');
-    const priority = document.querySelector('input:checked');
+    const priority = (function () {
+        const radios = form.elements['todoPriority'];
+        for (let i = 0; i < radios.length; i++) {
+            if (radios[i].checked) {
+              return radios[i].value;
+            }
+          }
+    })();
+
+    const todoValues = {title: title.value, 
+                        details: details.value, 
+                        dueDate: dueDate.value, 
+                        priority: priority.value};
 
     if (title.value) {
-        renderTodo(title.value, details.value, dueDate.value, priority.id);
-        //...............................
+        // SEND DATA TO TODOMANAGER TO CREATE TODO FOR THE BACKEND
+        PubSub.publishSync('createTodoToTodoManager', todoValues);
+        renderTodo(title.value, details.value, dueDate.value, priority.value);
     }
+    form.reset();
 }
+
 
 // Maybe refactor element creation --> bring back helper methods from last project
 
