@@ -36,7 +36,7 @@
             <div class="mainSection">
 
                 <div class="todoContainer">
-                    <div class="todoItem todoFinished">
+                    <!-- <div class="todoItem">
                         <div class="todoLeft">
                             <div class="todoPriority"></div>
                             <input type="checkbox" id="todoFinished" name="todoFinished">
@@ -49,8 +49,7 @@
                             <button class="editTodoButton todoButton"></button>
                             <button class="deleteTodoButton todoButton"></button>
                         </div>
-                    </div>
-    
+                    </div> -->
                 </div>
 
                 <div class="todoFooter">
@@ -68,7 +67,7 @@
 
         <div class="createTodoModal">
             <div class="modalTitle">
-                <p>New Note</p>
+                <p class="modalTitleText">New Note</p>
             </div>
             <form action="" class="newNoteForm" id="newNoteForm">
 
@@ -101,7 +100,7 @@
                         <label for="high">HIGH</label>
 
                         <div class="submitButtonDiv">
-                            <button type="submit">ADD TO DO</button>
+                            <button type="submit" class="submitButton">ADD TO DO</button>
                         </div>
                     </div>
 
@@ -109,7 +108,26 @@
                 </div>
             </form>
         </div>
+
         <div class="modalFullScreenOverlay"></div>
+
+        <div class="detailsModal">
+            <div class="detailsTop">
+                <p class="detailsTitle">rootinandtootin</p>
+                <button class="detailsCloseButton"></button>
+            </div>
+            <div class="detailsGrid">
+                <p>Project:</p>
+                <p>Priority:</p>
+                <p>Due Date:</p>
+                <p>Details:</p>
+    
+                <p class="detailsProject"></p>
+                <p class="detailsPriority"></p>
+                <p class="detailsDueDate"></p>
+                <p class="detailsDetails"></p>
+            </div>
+        </div>
 
     </div>
 </body>

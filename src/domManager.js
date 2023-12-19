@@ -7,6 +7,7 @@ import plusIcon from './images/plusIcon.svg';
 import closeIcon from './images/closeIcon.svg';
 import {parse, format} from 'date-fns';
 import { PubSub } from 'pubsub-js';
+import { el } from 'date-fns/locale';
 
 function renderAllImages() {
 
@@ -34,14 +35,20 @@ function renderAllImages() {
     deleteProjectButton.appendChild(trashIconElement);
 
     // Modal X icon
-    const closeContainer = document.querySelector('.modalTitle');
+    const closeTodoCreationContainer = document.querySelector('.modalTitle');
+    const closeDetailsContainer = document.querySelector('.detailsCloseButton');
+
     const closeIconElement = new Image();
     closeIconElement.src = closeIcon;
     closeIconElement.classList.add("closeIconImg");
-    closeContainer.appendChild(closeIconElement);
+
+    closeTodoCreationContainer.appendChild(closeIconElement);
+    closeDetailsContainer.appendChild(closeIconElement);
+
+
 }
 
-function renderCreateTodoModal() {
+function renderTodoModal(createOrEdit, idOfTodoToEdit) {
 
     const modal = document.querySelector('.createTodoModal');
     const modalOverlay = document.querySelector('.modalFullScreenOverlay');
@@ -51,26 +58,64 @@ function renderCreateTodoModal() {
     const closeIconElement = document.querySelector(".closeIconImg");
     const form = document.getElementById('newNoteForm');
 
+    // Add listeners to close the modal or submit the form
+
+    closeIconElement.addEventListener('click', closeModal);
+    form.addEventListener('submit', closeForm);
+
     function closeModal() {
         modal.classList.remove('show');
         modalOverlay.classList.remove('show');
         closeIconElement.removeEventListener('click', closeModal);
+        form.reset();
     }
 
     function closeForm(e) {
         e.preventDefault();
-        handleTodoFormData();
+        if (createOrEdit == 'create') {
+            handleTodoFormData('create', "");
+        } else {
+            handleTodoFormData('edit', idOfTodoToEdit);
+        }
         closeModal();
         form.removeEventListener('submit', closeForm);
     }
 
-    closeIconElement.addEventListener('click', closeModal);
-    form.addEventListener('submit', closeForm);
+    const modalTitle = document.querySelector('.modalTitleText');
+    modalTitle.innerText = "New Note";
+
+    const submitButton = document.querySelector('.submitButton');
+    submitButton.innerText = "ADD TO DO";
+
+    // If editing, change the modal title and submission button text,
+    // also preload the todos existing values for editing
+
+    if (createOrEdit === 'create') return;
+    modalTitle.innerText = "Edit Note";
+    submitButton.innerText = "CONFIRM EDIT";
+    populateFormWithExistingData(idOfTodoToEdit);
+}
+
+function populateFormWithExistingData(idOfTodoToEdit) {
+
+    const subscription = PubSub.subscribe('sendTodo', function(topicName, todoValues) {
+
+        const title = document.getElementById('titleInput');
+        const details = document.getElementById('detailsInput');
+        const dueDate = document.getElementById('dueDateInput');
+        const priority = document.getElementById(`${todoValues.priority}`);
+
+        title.value = todoValues.title;
+        details.value = todoValues.details;
+        dueDate.value = todoValues.dueDate;
+        priority.checked = true;
+    });
+    PubSub.publishSync('requestTodo', idOfTodoToEdit);
+    PubSub.unsubscribe(subscription);
 }
 
 // PUT THIS IN IT'S OWN MODULE LATER?
-
-function handleTodoFormData() {
+function handleTodoFormData(createOrEdit, idOfTodoToEdit) {
     const form = document.getElementById('newNoteForm');
     const title = document.getElementById('titleInput');
     const details = document.getElementById('detailsInput');
@@ -83,20 +128,42 @@ function handleTodoFormData() {
             }
         }
     })();
-    const todoValues = {title: title.value, 
+    const todoValues = {id: idOfTodoToEdit,
+                        title: title.value, 
                         details: details.value, 
                         dueDate: dueDate.value, 
                         priority: priority,
                         parentProjectId: 0};
     if (title.value) {
-        PubSub.publishSync('createTodoToTodoManager', todoValues);
+        if (createOrEdit == 'create') {
+            PubSub.publishSync('createTodoToTodoManager', todoValues);
+        } else {
+            PubSub.publishSync('editTodoToTodoManager', todoValues);
+        }
     }
     form.reset();
 }
 
-const listenForTodoId = PubSub.subscribe('assignTodo', function(msg, valuesToRender) {
+PubSub.subscribe('assignTodo', function(msg, valuesToRender) {
     renderTodo(valuesToRender.id, valuesToRender.title, valuesToRender.details, 
         valuesToRender.dueDate, valuesToRender.priority);
+});
+
+PubSub.subscribe('renderEditedTodo', function(msg, valuesToRender) {
+    const todoElement = document.querySelector(`.todoItem[data-id="${valuesToRender.id}"]`);
+    const priorityElement = todoElement.querySelector('.todoPriority');
+    const titleElement = todoElement.querySelector('.todoTitle');
+    const dueDateElement = todoElement.querySelector('.todoDueDate');
+
+    priorityElement.style.backgroundColor = valuesToRender.priority == 'low' 
+    ? 'green' : valuesToRender.priority == 'medium' ? 'orange' : 'red'; 
+
+    titleElement.innerText = valuesToRender.title;
+
+    const date = parse(valuesToRender.dueDate, 'yyyy-MM-dd', new Date());
+    const date2 = format(date, 'MMM do');
+    dueDateElement.innerText = date2;
+
 });
 
 // Maybe refactor element creation --> bring back helper methods from last project
@@ -119,18 +186,19 @@ function renderTodo(id, title, details, dueDate, priority) {
     isFinishedCheckbox.setAttribute('type', 'checkbox');
     isFinishedCheckbox.setAttribute('id', 'todoFinished');
     isFinishedCheckbox.setAttribute('name', 'todoFinished');
+    titleElement.classList.add('todoTitle');
 
     const todoRight = document.createElement('div');
-    const detailsElement = document.createElement('div');
+    const detailsButton = document.createElement('div');
     const dueDateElement = document.createElement('div');
     const editTodoButton = document.createElement('button');
     const deleteTodoButton = document.createElement('button');
 
     todoRight.classList.add('todoRight');
-    detailsElement.classList.add('todoDetails');
+    detailsButton.classList.add('todoDetails');
     dueDateElement.classList.add('todoDueDate');
-    editTodoButton.classList.add('todoButton');
-    deleteTodoButton.classList.add('todoButton');
+    editTodoButton.classList.add('todoButton', 'editTodoButton');
+    deleteTodoButton.classList.add('todoButton', 'deleteTodoButton');
 
     const editIconElement = new Image();
     editIconElement.src = editIcon;
@@ -146,7 +214,7 @@ function renderTodo(id, title, details, dueDate, priority) {
     todoLeft.appendChild(titleElement);
 
     todoItem.appendChild(todoRight);
-    todoRight.appendChild(detailsElement);
+    todoRight.appendChild(detailsButton);
     todoRight.appendChild(dueDateElement);
     todoRight.appendChild(editTodoButton);
     todoRight.appendChild(deleteTodoButton);
@@ -155,38 +223,103 @@ function renderTodo(id, title, details, dueDate, priority) {
     priorityElement.style.backgroundColor = priority == 'low' 
     ? 'green' : priority == 'medium' ? 'orange' : 'red'; 
     titleElement.innerText = title;
-    detailsElement.innerText = "DETAILS";
+    detailsButton.innerText = "DETAILS";
 
     const date = parse(dueDate, 'yyyy-MM-dd', new Date());
     const date2 = format(date, 'MMM do');
     dueDateElement.innerText = date2;
 
     // Add listeners
-    isFinishedCheckbox.addEventListener('change', function() {
 
+    // Finish the todo 
+    isFinishedCheckbox.addEventListener('change', function() {
         if (this.checked) {
-            console.log("Checkbox is checked..");
+            PubSub.publishSync('finishTodo', {finished: 1, id});
+            renderFinishedTodo(id, 1);
         } else {
-            console.log("Checkbox is not checked..");
+            PubSub.publishSync('finishTodo', {finished: 0, id});
+            renderFinishedTodo(id, 0);
         }
     });
     
-    // Details
+    // Present details to user
+    detailsButton.addEventListener('click', function () {
 
-    // Edit
+        let todoValues;
+        const subscription = PubSub.subscribe('sendTodo', function(topicName, values) {
+            todoValues = values;
+        });
+        PubSub.publishSync('requestTodo', id);
+        PubSub.unsubscribe(subscription);
 
-    // Delete
+        
+        const detailsModal = document.querySelector('.detailsModal');
+        const modalOverlay = document.querySelector('.modalFullScreenOverlay');
+        detailsModal.classList.add('show');
+        modalOverlay.classList.add('show');
+
+        const titleElement = document.querySelector('.detailsTitle');
+        const projectElement = document.querySelector('.detailsProject');
+        const priorityElement = document.querySelector('.detailsPriority');
+        const dueDateElement = document.querySelector('.detailsDueDate');
+        const detailsElement = document.querySelector('.detailsDetails');
+        const closeButtonElement = document.querySelector('.detailsCloseButton');
+
+        titleElement.textContent = todoValues.title;
+        projectElement.textContent = 'NEED TO IMPLEMENT';
+        priorityElement.textContent = todoValues.priority;
+        dueDateElement.textContent = todoValues.dueDate;
+        detailsElement.textContent = todoValues.details;
+
+        closeButtonElement.addEventListener('click', closeModal);
+        function closeModal() {
+            detailsModal.classList.remove('show');
+            modalOverlay.classList.remove('show');
+            closeButtonElement.removeEventListener('click', closeModal);
+        }
+    });
+
+    // Edit todo values
+    editTodoButton.addEventListener('click', function() {
+        renderTodoModal('edit', id);
+    });
+
+    deleteTodoButton.addEventListener('click', function() {
+        PubSub.publishSync('deleteTodoToTodoManager', id);
+        todoItem.remove();
+    });
     
-
-
     todoContainer.appendChild(todoItem);
 }
 
-function renderFinishedTodo(todoId) {
+function renderFinishedTodo(todoId, finished) {
+    const todoElement = document.querySelector(`.todoItem[data-id="${todoId}"]`);
+    const title = todoElement.querySelector('.todoTitle');
+    const details = todoElement.querySelector('.todoDetails');
+    const dueDate = todoElement.querySelector('.todoDueDate');
+    const editButton = todoElement.querySelector('.editTodoButton');
+    const deleteButton = todoElement.querySelector('.deleteTodoButton');
+
+    if (finished) {
+        title.classList.add('titleFinished');
+        details.classList.add('detailsFinished');
+        dueDate.classList.add('dueDateFinished');
+        editButton.childNodes[0].src = editIconGray;
+        deleteButton.childNodes[0].src = trashIconGray;
+    } else {
+        title.classList.remove('titleFinished');
+        details.classList.remove('detailsFinished');
+        dueDate.classList.remove('dueDateFinished');
+        editButton.childNodes[0].src = editIcon;
+        deleteButton.childNodes[0].src = trashIcon;
+    }
+}
+
+function renderTodosForProject() {
 
 }
 
-function renderProject() {
+function renderNotes() {
 
 }
 
@@ -200,7 +333,7 @@ function renderScreen() {
 
 function setupListeners() {
     const addTodoButton = document.querySelector('.addTodoButton');
-    addTodoButton.addEventListener('click', renderCreateTodoModal);
+    addTodoButton.addEventListener('click', () => renderTodoModal('create', ""));
 }
 
 export {renderScreen, setupListeners}

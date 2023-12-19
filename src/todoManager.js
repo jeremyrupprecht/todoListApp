@@ -5,6 +5,11 @@ import { parseISO } from 'date-fns';
 
 function createTodoManager() {
 
+    const getTodo = (topicName, id) => {
+        const todo = JSON.parse(localStorage.getItem(`todo-${id}`));
+        PubSub.publishSync('sendTodo',todo);
+    }
+
     const getAllTodos = () => {
         const allTodos = []
         const keys = Object.keys(localStorage);
@@ -55,17 +60,39 @@ function createTodoManager() {
         return newTodo;
     }
 
-    const editTodo = (idOfTodoToEdit, title, details, dueDate, priority) => {
-        const todoValues = JSON.parse(localStorage.getItem(`todo-${idOfTodoToEdit}`));
+    const editTodo = (topicName, todoValues) => {
+
+        const idOfTodoToEdit = todoValues.id;
+        const title = todoValues.title;
+        const details = todoValues.details;
+        const dueDate = todoValues.dueDate;
+        const priority = todoValues.priority;
+
+        const todoFromStorage = JSON.parse(localStorage.getItem(`todo-${idOfTodoToEdit}`));
         if (todoValues) {
-            const editedTodo = createTodo(todoValues.id, title, details, dueDate, priority, 
-                                          todoValues.isFinished, todoValues.parentProjectId);
+            const editedTodo = createTodo(idOfTodoToEdit, title, details, dueDate, 
+                                          priority, todoFromStorage.isFinished,
+                                          todoFromStorage.parentProjectId);
             localStorage.setItem(`todo-${idOfTodoToEdit}`, JSON.stringify(editedTodo.getTodo())); 
+            PubSub.publishSync('renderEditedTodo', editedTodo.getTodo());
+        }
+    }
+
+    const finishTodo = (topicName, finishedObject) => {
+        const idOfTodoToFinish = finishedObject.id;
+        const isFinished = finishedObject.finished;
+        const todoValues = JSON.parse(localStorage.getItem(`todo-${idOfTodoToFinish}`));
+        if (todoValues) {
+            const editedTodo = createTodo(todoValues.id, todoValues.title, 
+                                          todoValues.details, todoValues.dueDate,
+                                          todoValues.priority, isFinished, 
+                                          todoValues.parentProjectId);
+            localStorage.setItem(`todo-${idOfTodoToFinish}`, JSON.stringify(editedTodo.getTodo())); 
         }
     }
 
     // This publishes to the PubSub mediator
-    const deleteTodo = (idOfTodoToDelete) => {
+    const deleteTodo = (topicName, idOfTodoToDelete) => {
         if (localStorage.getItem(`todo-${idOfTodoToDelete}`)) {
             // Publish todo deletion to project manager
             PubSub.publishSync('deleteTodo', idOfTodoToDelete);
@@ -83,15 +110,14 @@ function createTodoManager() {
         }
     }
 
-    // const testPubSub = (topicName, todoValues) => {
-    //     console.log("TODOSIDE", todoValues);
-    // }
-
     // Subscribe to / listen for project deletion events --> need to delete all
     // todos associated with the deleted project
     const listenForDeletedProjects = PubSub.subscribe('deleteProject', deleteAllTodosForThisProject);
-
     const listenForCreatedTodos = PubSub.subscribe('createTodoToTodoManager', createAndSaveTodo);
+    const listenForFinishedTodos = PubSub.subscribe('finishTodo', finishTodo);
+    const listenForDeletedTodos = PubSub.subscribe('deleteTodoToTodoManager', deleteTodo);
+    const listenForEditedTodos = PubSub.subscribe('editTodoToTodoManager', editTodo);
+    const listenForRequestedTodos = PubSub.subscribe('requestTodo', getTodo);
 
     return {getAllTodos, getAllTodosDueBeforeThisDate, getTodoIdsOfThisProject, createAndSaveTodo, editTodo, deleteTodo}
 }
