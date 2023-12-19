@@ -41,9 +41,7 @@ const noteState = createNoteManager();
 renderScreen();
 setupListeners();
 
-
-
-// let testProject = projectState.createAndSaveProject(0, 'The first project', []);
+let testProject = projectState.createAndSaveProject(0, 'The first project', []);
 // let testProject2 = projectState.createAndSaveProject(1, '2nd project', []);
 
 // let testDate = format(new Date(1995, 0, 14), 'yyyy-MM-dd');

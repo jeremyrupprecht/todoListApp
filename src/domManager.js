@@ -79,20 +79,20 @@ function handleTodoFormData() {
         const radios = form.elements['todoPriority'];
         for (let i = 0; i < radios.length; i++) {
             if (radios[i].checked) {
-              return radios[i].value;
+                return radios[i].value;
             }
-          }
+        }
     })();
-
     const todoValues = {title: title.value, 
                         details: details.value, 
                         dueDate: dueDate.value, 
-                        priority: priority.value};
+                        priority: priority,
+                        parentProjectId: 0};
 
     if (title.value) {
         // SEND DATA TO TODOMANAGER TO CREATE TODO FOR THE BACKEND
         PubSub.publishSync('createTodoToTodoManager', todoValues);
-        renderTodo(title.value, details.value, dueDate.value, priority.value);
+        renderTodo(title.value, details.value, dueDate.value, priority);
     }
     form.reset();
 }
