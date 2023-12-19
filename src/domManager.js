@@ -88,24 +88,26 @@ function handleTodoFormData() {
                         dueDate: dueDate.value, 
                         priority: priority,
                         parentProjectId: 0};
-
     if (title.value) {
-        // SEND DATA TO TODOMANAGER TO CREATE TODO FOR THE BACKEND
         PubSub.publishSync('createTodoToTodoManager', todoValues);
-        renderTodo(title.value, details.value, dueDate.value, priority);
     }
     form.reset();
 }
 
+const listenForTodoId = PubSub.subscribe('assignTodo', function(msg, valuesToRender) {
+    renderTodo(valuesToRender.id, valuesToRender.title, valuesToRender.details, 
+        valuesToRender.dueDate, valuesToRender.priority);
+});
 
 // Maybe refactor element creation --> bring back helper methods from last project
 
-function renderTodo(title, details, dueDate, priority) {
+function renderTodo(id, title, details, dueDate, priority) {
 
     // Create Elements
     const todoContainer = document.querySelector('.todoContainer');
     const todoItem = document.createElement('div');
     todoItem.classList.add('todoItem');
+    todoItem.setAttribute('data-id', id);
 
     const todoLeft = document.createElement('div');
     const priorityElement = document.createElement('div');

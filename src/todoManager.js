@@ -46,8 +46,12 @@ function createTodoManager() {
         }
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished, parentProjectId);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
-        // Publish todo creation to project manager
+
+        // Publish todo creation to project manager and publish todo id back
+        // to the dom manager (to link the DOM element and todo together)
         PubSub.publishSync('createTodo', id);
+        PubSub.publishSync('assignTodo', newTodo.getTodo());
+
         return newTodo;
     }
 
