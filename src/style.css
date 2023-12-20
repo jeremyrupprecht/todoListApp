@@ -251,6 +251,18 @@ input[type="checkbox"] {
     background: none;
 }
 
+.editProjectButton {
+    display: none;
+}
+
+.deleteProjectButton {
+    display: none;
+}
+
+.editProjectButton.show, .deleteProjectButton.show {
+    display: block;
+}
+
 /* .footerButton:hover {
     fill: rgba(255, 255, 255, 0.144);
 } */

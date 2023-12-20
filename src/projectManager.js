@@ -3,11 +3,17 @@ import { PubSub } from 'pubsub-js';
 
 function createProjectManager() {
 
-    const getProjectFromStorage = (id) => {
+    const getProjectFromStorage = (topicName, requestType) => {
+        const id = requestType.id;
         const projectValues = JSON.parse(localStorage.getItem(`project-${id}`));
         if (projectValues) {
             const projectToReturn = createProject(projectValues.id, 
                                     projectValues.title, projectValues.todoIds);
+
+            if (requestType.type == 'requestProject') {
+                PubSub.publishSync('sendProject', projectToReturn);
+                return
+            }
             return projectToReturn;
         }
         console.log("Project does not Exist!");
@@ -35,7 +41,7 @@ function createProjectManager() {
     // Called WHENEVER a todo is created (every todo must have a parent project)
     const addTodoToProject = (topicName, idOfTodoToAdd) => {
         const todoToAdd = JSON.parse(localStorage.getItem(`todo-${idOfTodoToAdd}`));
-        const projectToBeAddedto = getProjectFromStorage(todoToAdd.parentProjectId);
+        const projectToBeAddedto = getProjectFromStorage('', {id: todoToAdd.parentProjectId});
         projectToBeAddedto.addTodo(todoToAdd.id);
         localStorage.setItem(`project-${projectToBeAddedto.getProject().id}`, JSON.stringify(projectToBeAddedto.getProject()));
     }
@@ -43,7 +49,7 @@ function createProjectManager() {
     // Called WHENEVER a todo is deleted (the parent's todo is reference must be deleted)
     const removeTodoFromProject = (topicName, idOfTodoToRemove) => {
         const todoToRemove = JSON.parse(localStorage.getItem(`todo-${idOfTodoToRemove}`));
-        const projectToBeRemovedFrom = getProjectFromStorage(todoToRemove.parentProjectId);
+        const projectToBeRemovedFrom = getProjectFromStorage('', {id: todoToRemove.parentProjectId});
         projectToBeRemovedFrom.removeTodo(todoToRemove.id);
         localStorage.setItem(`project-${projectToBeRemovedFrom.getProject().id}`, JSON.stringify(projectToBeRemovedFrom.getProject()));
     }
@@ -66,10 +72,19 @@ function createProjectManager() {
         return newProject;
     }
 
-    const editProjectTitle = (idOfProjectToEdit, title) => {
-        const projectToEdit = getProjectFromStorage(idOfProjectToEdit);
+    const editProjectTitle = (topicName, requestType) => {
+        const idOfProjectToEdit = requestType.id;
+        const title = requestType.title;
+
+        const projectToEdit = getProjectFromStorage('', {id: idOfProjectToEdit});
         projectToEdit.setTitle(title);
         localStorage.setItem(`project-${projectToEdit.getProject().id}`, JSON.stringify(projectToEdit.getProject())); 
+
+        if (requestType.type == 'editProjectTitle') {
+            PubSub.publishSync('sendEditedProject', projectToEdit);
+        }
+
+
     }
 
     // This publishes to the PubSub mediator
@@ -85,6 +100,9 @@ function createProjectManager() {
     const listenForDeletedTodos = PubSub.subscribe('deleteTodo', removeTodoFromProject);
     const listenForCreatedProjects = PubSub.subscribe('createProjectToProjectManager', createAndSaveProject);
     const listenForRequestedAllProjects = PubSub.subscribe('requestAllProjects', getAllProjects)
+    const listenForRequestedProjects = PubSub.subscribe('requestProject', getProjectFromStorage);
+    const listenForEditedProjects = PubSub.subscribe('editProjectToProjectManager', editProjectTitle);
+
 
     return {getProjectFromStorage, addTodoToProject, removeTodoFromProject, createAndSaveProject, editProjectTitle,
             deleteProject}

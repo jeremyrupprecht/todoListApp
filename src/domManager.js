@@ -107,10 +107,10 @@ function renderTodoModal(createOrEdit, idOfTodoToEdit) {
     if (createOrEdit === 'create') return;
     modalTitle.innerText = "Edit Note";
     submitButton.innerText = "CONFIRM EDIT";
-    populateFormWithExistingData(idOfTodoToEdit);
+    populateTodoFormWithExistingData(idOfTodoToEdit);
 }
 
-function populateFormWithExistingData(idOfTodoToEdit) {
+function populateTodoFormWithExistingData(idOfTodoToEdit) {
 
     const subscription = PubSub.subscribe('sendTodo', function(topicName, todoValues) {
 
@@ -347,14 +347,33 @@ function renderTodosForProject(projectId) {
         renderTodo(todos[i].id, todos[i].title, todos[i].dueDate, 
                    todos[i].dueDate, todos[i].priority);
     }
+
+    // Only user created projects (every project excluding home, today and week)
+    // can have their title edited, (or can be deleted entirely), if the project
+    // is user created, render the edit title and delete project buttons
+    const editProjectButton = document.querySelector('.editProjectButton');
+    const deleteProjectButton = document.querySelector('.deleteProjectButton');
+    if (projectId > 2) {
+        editProjectButton.classList.add('show');
+        deleteProjectButton.classList.add('show');
+    } else {
+        editProjectButton.classList.remove('show');
+        deleteProjectButton.classList.remove('show');
+    }
 }
 
-function handleProjectFormData(createOrEdit, idOfProjectToEdit) {
+function handleProjectFormData(createOrEdit) {
 
-    const subscription = PubSub.subscribe('sendNewProject', function(topicName, projectToRender) {
+    const getAndRenderNewProject = PubSub.subscribe('sendNewProject', function(topicName, projectToRender) {
         renderProject(projectToRender.id, projectToRender.title);
     });
 
+    const getAndRenderEditedProject = PubSub.subscribe('sendEditedProject', function(topicName, projectToRender) {
+        const projectElement = document.querySelector(`p[data-id="${projectToRender.id}"]`);
+        projectElement.textContent = projectToRender.title;
+    });
+
+    const idOfProjectToEdit = currentProject;
     const form = document.getElementById('newProjectForm');
     const title = document.getElementById('projectTitleInput');
 
@@ -362,11 +381,11 @@ function handleProjectFormData(createOrEdit, idOfProjectToEdit) {
         if (createOrEdit == 'create') {
             PubSub.publishSync('createProjectToProjectManager', {type: 'createNewProject', title: title.value});
         } else {
-            // PubSub.publishSync('editProjectToProjectManager', idOfProjectToEdit);
+            PubSub.publishSync('editProjectToProjectManager',{type: 'editProjectTitle',id: idOfProjectToEdit, title: title.value});
         }
     }
 
-    PubSub.unsubscribe(subscription);
+    PubSub.unsubscribe(getAndRenderNewProject);
     form.reset();
 }
 
@@ -374,6 +393,7 @@ function renderProject(projectId, title) {
     const projectsContainer = document.querySelector('.newProjects');
     const newProjectHeader = document.createElement('p');
     newProjectHeader.textContent = title;
+    newProjectHeader.setAttribute('data-id', projectId);
     projectsContainer.appendChild(newProjectHeader);
 
     // add event listener
@@ -405,10 +425,78 @@ function renderExistingProjects() {
     }
 }
 
+function renderProjectModal(createOrEdit) {
+
+    // Show modal
+    const addProjectModal = document.querySelector('.addProjectModal');
+    const modalOverlay = document.querySelector('.modalFullScreenOverlay');
+    addProjectModal.classList.add('show');
+    modalOverlay.classList.add('show');
+
+    // Handle closing or submitting the form
+    const closeIconElement = document.querySelector(".projectCreationCloseIcon");
+    const form = document.getElementById('newProjectForm');
+
+    // Add listeners to close the modal or submit the form
+    closeIconElement.addEventListener('click', closeModal);
+    form.addEventListener('submit', submitForm);
+
+    function closeModal() {
+        addProjectModal.classList.remove('show');
+        modalOverlay.classList.remove('show');
+        closeIconElement.removeEventListener('click', closeModal);
+        form.removeEventListener('submit', submitForm);
+        form.reset();
+    }
+
+    function submitForm(e) {
+        e.preventDefault();
+
+        if (createOrEdit == 'create') {
+            handleProjectFormData('create');
+        } else {
+            handleProjectFormData('edit');
+        }
+        closeModal();
+    }
+
+    const modalTitle = document.querySelector('.AddProjectModalTitleText');
+    modalTitle.innerText = "New Project";
+
+    const submitButton = document.querySelector('.submitNewProject');
+    submitButton.innerText = "ADD PROJECT";
+
+    // If editing, change the modal title and submission button text,
+    // also preload the todos existing values for editing
+
+    if (createOrEdit === 'create') return;
+    modalTitle.innerText = "Edit Project";
+    submitButton.innerText = "CONFIRM EDIT";
+    populateProjectFormWithExistingTitle();
+
+}
+
+function populateProjectFormWithExistingTitle() {
+
+    const currentProjectid = currentProject;
+
+    const subscription = PubSub.subscribe('sendProject', function(topicName, project) {
+        const title = document.getElementById('projectTitleInput');
+        title.value = project.title;
+    });
+    PubSub.publishSync('requestProject', {type: 'requestProject', id: currentProjectid});
+    PubSub.unsubscribe(subscription);
+}
+
 function renderScreen() {
     renderAllImages();
     renderTodosForProject(0);
     renderExistingProjects();
+}
+
+
+function disableAllOtherButtonsWhileModalActive() {
+
 }
 
 let currentProject = 0;
@@ -439,37 +527,15 @@ function setupListeners() {
     // Add projects button
     const addProjectButton = document.querySelector('.addProjectButton');
     addProjectButton.addEventListener('click', () => {
+        renderProjectModal('create');
+    });
 
-        // renderAddProjectModal() --> maybe move this somewhere else??
-        // It kind of makes sense to have it here --> less clutter and scrolling
-        // and this function is ONLY called here so it makes sense to put it here
-        const addProjectModal = document.querySelector('.addProjectModal');
-        const modalOverlay = document.querySelector('.modalFullScreenOverlay');
-        addProjectModal.classList.add('show');
-        modalOverlay.classList.add('show');
+    // Edit and delete project buttons
 
-        // Handle closing or submitting the form
-        const closeIconElement = document.querySelector(".projectCreationCloseIcon");
-        const form = document.getElementById('newProjectForm');
-    
-        // Add listeners to close the modal or submit the form
-        closeIconElement.addEventListener('click', closeModal);
-        form.addEventListener('submit', submitForm);
-    
-        function closeModal() {
-            addProjectModal.classList.remove('show');
-            modalOverlay.classList.remove('show');
-            closeIconElement.removeEventListener('click', closeModal);
-            form.removeEventListener('submit', submitForm);
-            form.reset();
-        }
-    
-        function submitForm(e) {
-            e.preventDefault();
-            handleProjectFormData('create', '');
-            closeModal();
-        }
-        
+    const editProjectButton = document.querySelector('.editProjectButton');
+    const deleteProjectButton = document.querySelector('.deleteProjectButton');
+    editProjectButton.addEventListener('click', () => {
+        renderProjectModal('edit');
     });
 
     // Notes Button
