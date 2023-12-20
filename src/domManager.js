@@ -352,15 +352,7 @@ function renderTodosForProject(projectId) {
 function handleProjectFormData(createOrEdit, idOfProjectToEdit) {
 
     const subscription = PubSub.subscribe('sendNewProject', function(topicName, projectToRender) {
-
-        const projectsContainer = document.querySelector('.newProjects');
-        const newProjectHeader = document.createElement('p');
-        // console.log(projectValues.title);
-        newProjectHeader.textContent = projectToRender.title;
-        projectsContainer.appendChild(newProjectHeader);
-
-        // add event listener
-
+        renderProject(projectToRender.id, projectToRender.title);
     });
 
     const form = document.getElementById('newProjectForm');
@@ -376,20 +368,47 @@ function handleProjectFormData(createOrEdit, idOfProjectToEdit) {
 
     PubSub.unsubscribe(subscription);
     form.reset();
-
 }
 
-function renderNotes() {
+function renderProject(projectId, title) {
+    const projectsContainer = document.querySelector('.newProjects');
+    const newProjectHeader = document.createElement('p');
+    newProjectHeader.textContent = title;
+    projectsContainer.appendChild(newProjectHeader);
 
+    // add event listener
+    newProjectHeader.addEventListener('click', () => {
+        currentProject = projectId;
+        renderTodosForProject(projectId);
+    });
 }
 
-function renderNote() {
+function renderExistingProjects() {
 
+    // There are 3 default projects (home, today, and week), with ids 0,1 and 2
+    // respectively, if there are other existing projects, their id's start 
+    // counting up from 3
+    if (localStorage.getItem('project-3')) {
+
+        let projects;
+        const subscription = PubSub.subscribe('sendAllProjects', function(msg, receivedProjects) {
+            projects = receivedProjects;
+        });
+        PubSub.publishSync('requestAllProjects', {type: 'renderProjects'});
+        PubSub.unsubscribe(subscription);
+
+        for (let i = 0; i < projects.length; i++) {
+            if (projects[i].id > 2) {
+                renderProject(projects[i].id, projects[i].title);
+            }
+        }
+    }
 }
 
 function renderScreen() {
     renderAllImages();
     renderTodosForProject(0);
+    renderExistingProjects();
 }
 
 let currentProject = 0;
@@ -455,5 +474,16 @@ function setupListeners() {
 
     // Notes Button
 }
+
+// ------------------------
+
+function renderNotes() {
+
+}
+
+function renderNote() {
+
+}
+
 
 export {renderScreen, setupListeners}

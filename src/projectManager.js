@@ -13,14 +13,22 @@ function createProjectManager() {
         console.log("Project does not Exist!");
     }
 
-    const getAllProjects = () => {
-        const allProjects = []
+    const getAllProjects = (topicId, requestType) => {
+        const allProjects = [];
         const keys = Object.keys(localStorage);
         for (let i = 0; i < keys.length; i++) {
             if (keys[i].includes("project")) {
                 allProjects.push(JSON.parse(localStorage.getItem(keys[i])));
             }
         }
+
+        if (requestType) {
+            if (requestType.type = 'renderProjects') {
+                PubSub.publishSync('sendAllProjects', allProjects);
+                return
+            }
+        }
+
         return allProjects;
     }
 
@@ -42,7 +50,7 @@ function createProjectManager() {
 
     const createAndSaveProject = (topicName, requestType) => {
         const title = requestType.title;
-        const id = getAllProjects().length;
+        const id = getAllProjects('', '').length;
         // Don't allow duplicate id's
         if (localStorage.getItem(`project-${id}`)) {
             console.log("A Project with that id already exists!");
@@ -76,6 +84,7 @@ function createProjectManager() {
     const listenForCreatedTodos = PubSub.subscribe('createTodo', addTodoToProject);
     const listenForDeletedTodos = PubSub.subscribe('deleteTodo', removeTodoFromProject);
     const listenForCreatedProjects = PubSub.subscribe('createProjectToProjectManager', createAndSaveProject);
+    const listenForRequestedAllProjects = PubSub.subscribe('requestAllProjects', getAllProjects)
 
     return {getProjectFromStorage, addTodoToProject, removeTodoFromProject, createAndSaveProject, editProjectTitle,
             deleteProject}
