@@ -67,7 +67,6 @@ button {
     flex-direction: column;
     padding: 50px;
     gap: 20px;
-
 }
 
 
@@ -96,6 +95,38 @@ button {
 /* .numberOfTodos > p {
 
 } */
+
+.projectsSideBarFlexbox {
+    display: flex;
+    flex-direction: column;
+    margin: 20px 0px 0px 25px;
+}
+
+.projectHeader.projects {
+    display: flex;
+    flex-direction: column;
+}
+
+.newProjects {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.newProjects > p {
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
+.newProjects > p:last-child {
+    margin-bottom: 20px;
+}
+
+.addProjectButton {
+    height: 24px;
+    width: 24px;
+    background-color: transparent;
+}
 
 .mainSection {
     grid-area: 2 / 2 / 3 / 3;
@@ -238,7 +269,7 @@ input[type="checkbox"] {
     z-index: 2;
 }
 
-.createTodoModal.show, .modalFullScreenOverlay.show, .detailsModal.show {
+.createTodoModal.show, .modalFullScreenOverlay.show, .detailsModal.show, .addProjectModal.show {
     display: flex;
 }
 
@@ -247,7 +278,7 @@ input[type="checkbox"] {
     height: 100vh;
     width: 100vw;
     position: absolute;
-    background-color: rgba(0, 0, 0, 0.315);
+    background-color: rgba(0, 0, 0, 0.747);
     pointer-events: none;
     z-index: 1;
 }
@@ -419,6 +450,7 @@ input[type="radio"] {
     padding: 20px;
 
     flex-direction: column;
+    z-index: 2;
 }
 
 .detailsTop {
@@ -443,6 +475,35 @@ input[type="radio"] {
     background-color: transparent;
     margin-left: auto;
 }
+
+.addProjectModal {
+    display: none;
+    position: absolute;
+    background-color: var(--darkBlack);
+    height: 150px;
+    width: 70%;
+    max-width: 500px;
+    border-radius: 20px;
+    padding: 20px;
+
+    flex-direction: column;
+    gap: 20px;
+    z-index: 2;
+}
+
+.addProjectModalTitle {
+    display: flex;
+    justify-content: space-between;
+}
+
+.formRowProject {
+    width: 100%;
+    /* border: 1px solid white; */
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
 
 @media only screen and (max-width: 1280px) {
     .centerContainerGrid {

@@ -28,9 +28,20 @@ function createTodoManager() {
         return todosBeforeThisDate;
     }
     
-    const getTodoIdsOfThisProject = (projectId) => {
-        const todoIds = JSON.parse(localStorage.getItem(`project-${projectId}`)).todoIds;
-        return todoIds;
+    const getTodosOfThisProject = (topicName, requestType) => {
+        const projectId = requestType.projectId;
+        const retrievedIds = JSON.parse(localStorage.getItem(`project-${projectId}`)).todoIds;
+        const todosToReturn = [];
+        for (let i = 0; i < retrievedIds.length; i++) {
+            todosToReturn.push(JSON.parse(localStorage.getItem(`todo-${retrievedIds[i]}`)));
+        }
+
+        if (requestType.type == "renderTodosForProject") {
+            PubSub.publishSync('sendTodosOfProject', todosToReturn);
+            return
+        }
+
+        return todosToReturn;
     }
 
     // This publishes to the PubSub mediator
@@ -104,9 +115,9 @@ function createTodoManager() {
 
     // Called WHENEVER a project is deleted --> all of it's todos are deleted as well
     const deleteAllTodosForThisProject = (topicName, projectId) => {
-        const todoIds = getTodoIdsOfThisProject(projectId);
-        for (let i = 0; i < todoIds.length; i++) {
-            localStorage.removeItem(`todo-${todoIds[i]}`);
+        const todos = getTodosOfThisProject(projectId); 
+        for (let i = 0; i < todos.length; i++) {
+            localStorage.removeItem(`todo-${todos[i].getTodo().id}`);
         }
     }
 
@@ -117,9 +128,11 @@ function createTodoManager() {
     const listenForFinishedTodos = PubSub.subscribe('finishTodo', finishTodo);
     const listenForDeletedTodos = PubSub.subscribe('deleteTodoToTodoManager', deleteTodo);
     const listenForEditedTodos = PubSub.subscribe('editTodoToTodoManager', editTodo);
-    const listenForRequestedTodos = PubSub.subscribe('requestTodo', getTodo);
+    const listenForRequestedTodo = PubSub.subscribe('requestTodo', getTodo);
+    const listenForRequestedTodosOfAProject = PubSub.subscribe('requestTodosOfProject', getTodosOfThisProject);
+    
 
-    return {getAllTodos, getAllTodosDueBeforeThisDate, getTodoIdsOfThisProject, createAndSaveTodo, editTodo, deleteTodo}
+    return {getAllTodos, getAllTodosDueBeforeThisDate, getTodosOfThisProject, createAndSaveTodo, editTodo, deleteTodo}
 }
 
 export { createTodoManager }

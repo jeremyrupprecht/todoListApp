@@ -7,19 +7,60 @@ import { renderScreen, setupListeners} from './domManager';
 
 function preloadData(todoManager, projectManager, noteManager) {
 
-    // Preloaded data already there
-    if (localStorage.length) {
+    // Need to load template todos if there are none (like when the user first
+    // opens the site)
 
-        // add project and note methods ...
+    if (!localStorage.getItem('todo-0')) {
+        console.log("preloading data...");
 
+        const date1 = format(new Date(1995, 0, 14), 'yyyy-MM-dd');
+        const date2 = format(new Date(1995, 0, 16), 'yyyy-MM-dd');
 
-        return
+        // Set up a loop for these
+
+        const values0 = {title: 'TODO 0', details: 'DETAILS0', dueDate: date1, 
+        priority: 'low', isFinished: false, parentProjectId: 0};
+        PubSub.publishSync('createTodoToTodoManager', values0);
+
+        const values1 = {title: 'TODO 1', details: 'DETAILS11', dueDate: date2, 
+        priority: 'medium', isFinished: false, parentProjectId: 0};
+        PubSub.publishSync('createTodoToTodoManager', values1);
+
+        const values2 = {title: 'TODO 2', details: 'DETAILS22', dueDate: date1, 
+        priority: 'high', isFinished: false, parentProjectId: 0};
+        PubSub.publishSync('createTodoToTodoManager', values2);
+
+        const values3 = {title: 'TODO 3', details: 'DETAILS33', dueDate: date1, 
+        priority: 'low', isFinished: false, parentProjectId: 0};
+        PubSub.publishSync('createTodoToTodoManager', values3);
+
+        const values4 = {title: 'TODO 4', details: 'DETAILS44', dueDate: date1, 
+        priority: 'low', isFinished: false, parentProjectId: 1};
+        PubSub.publishSync('createTodoToTodoManager', values4);
+
+        const values5 = {title: 'TODO 5', details: 'DETAILS55', dueDate: date1, 
+        priority: 'low', isFinished: false, parentProjectId: 1};
+        PubSub.publishSync('createTodoToTodoManager', values5);
+
+        const values6 = {title: 'TODO 6', details: 'DETAILS66', dueDate: date1, 
+        priority: 'low', isFinished: false, parentProjectId: 2};
+        PubSub.publishSync('createTodoToTodoManager', values6);
     }
+}
 
-    // Need to load template data if storage is empty (like when the user
-    // first opens the site)
+function createDefaultProjects(projectManager) {
 
-        // id's start from 0
+    if (!localStorage.getItem('project-0')) {
+
+        const homeProject = {type: '', title: 'Home'};
+        PubSub.publishSync('createProjectToProjectManager', homeProject);
+        
+        const todayProject = {type: '', title: 'Today'};
+        PubSub.publishSync('createProjectToProjectManager', todayProject);
+
+        const weekProject = {type: '', title: 'Week'};
+        PubSub.publishSync('createProjectToProjectManager', weekProject);
+    }
 }
 
 // const testD = format(new Date(1995, 0, 14), 'MMM Do');
@@ -31,37 +72,22 @@ function preloadData(todoManager, projectManager, noteManager) {
 // PubSub.unsubscribe(subscription1);
 // PubSub.publishSync('topic1', 'Hello again!');
 
-
-localStorage.clear();
 const todoState = createTodoManager();
 const projectState = createProjectManager();
 const noteState = createNoteManager();
 
-// preloadData(todoState, projectState, noteState);
+// localStorage.clear();
+
+createDefaultProjects(projectState);
+preloadData(todoState, projectState, noteState);
+
+
 renderScreen();
 setupListeners();
 
-let testProject = projectState.createAndSaveProject(0, 'The first project', []);
-// let testProject2 = projectState.createAndSaveProject(1, '2nd project', []);
 
-// let testDate = format(new Date(1995, 0, 14), 'yyyy-MM-dd');
-// let todo0 = todoState.createAndSaveTodo('TODO 0', 'test note details', 
-//                                         testDate, 'low', false, 0);
-
-// let newDate = format(new Date(1995, 0, 16), 'yyyy-MM-dd');
-// // todoState.editTodo(todo1, 'newTitle', 'newDetails', newDate, 'high');
-
-// let todo1 = todoState.createAndSaveTodo('TODO 1', 'test todo details2', 
-//                                         testDate, 'high', false, 0);
-
-// let todo2 = todoState.createAndSaveTodo('TODO 2', 'test todo details3', 
-//                                         newDate, 'low', false, 0);
-                                                                 
-// let todo3 = todoState.createAndSaveTodo('TODO 3', 'test todo details4', 
-//                                         testDate, 'medium', false, 0);
-
-// let todo4 = todoState.createAndSaveTodo('TODO 4', 'test todo details5', 
-//                                         testDate, 'low', false, 1);
+// const testTodos = todoState.getTodosOfThisProject(0);
+// console.log(testTodos);
 
 
 /*

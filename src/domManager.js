@@ -37,15 +37,29 @@ function renderAllImages() {
     // Modal X icon
     const closeTodoCreationContainer = document.querySelector('.modalTitle');
     const closeDetailsContainer = document.querySelector('.detailsCloseButton');
+    const closeProjectCreationContainer = document.querySelector('.addProjectModalTitle');
 
     const closeIconElement = new Image();
     closeIconElement.src = closeIcon;
-    closeIconElement.classList.add("closeIconImg");
+    closeIconElement.classList.add("todoCreationCloseIcon");
+
+    const closeIconElement2 = new Image();
+    closeIconElement2.src = closeIcon;
+    closeIconElement2.classList.add("showDetailsCloseIcon");
+
+    const closeIconElement3 = new Image();
+    closeIconElement3.src = closeIcon;
+    closeIconElement3.classList.add("projectCreationCloseIcon");
 
     closeTodoCreationContainer.appendChild(closeIconElement);
-    closeDetailsContainer.appendChild(closeIconElement);
+    closeDetailsContainer.appendChild(closeIconElement2);
+    closeProjectCreationContainer.appendChild(closeIconElement3);
 
-
+    // Add Projects button
+    const addProjectButton = document.querySelector('.addProjectButton');
+    const plusIconElement2 = new Image();
+    plusIconElement2.src = plusIcon;
+    addProjectButton.appendChild(plusIconElement2);
 }
 
 function renderTodoModal(createOrEdit, idOfTodoToEdit) {
@@ -55,7 +69,7 @@ function renderTodoModal(createOrEdit, idOfTodoToEdit) {
     modal.classList.add('show');
     modalOverlay.classList.add('show');
 
-    const closeIconElement = document.querySelector(".closeIconImg");
+    const closeIconElement = document.querySelector(".todoCreationCloseIcon");
     const form = document.getElementById('newNoteForm');
 
     // Add listeners to close the modal or submit the form
@@ -133,7 +147,7 @@ function handleTodoFormData(createOrEdit, idOfTodoToEdit) {
                         details: details.value, 
                         dueDate: dueDate.value, 
                         priority: priority,
-                        parentProjectId: 0};
+                        parentProjectId: currentProject};
     if (title.value) {
         if (createOrEdit == 'create') {
             PubSub.publishSync('createTodoToTodoManager', todoValues);
@@ -163,7 +177,6 @@ PubSub.subscribe('renderEditedTodo', function(msg, valuesToRender) {
     const date = parse(valuesToRender.dueDate, 'yyyy-MM-dd', new Date());
     const date2 = format(date, 'MMM do');
     dueDateElement.innerText = date2;
-
 });
 
 // Maybe refactor element creation --> bring back helper methods from last project
@@ -315,7 +328,54 @@ function renderFinishedTodo(todoId, finished) {
     }
 }
 
-function renderTodosForProject() {
+function renderTodosForProject(projectId) {
+
+    // Clear any existing todos
+    const todoContainer = document.querySelector('.todoContainer');
+    todoContainer.innerHTML = '';
+    
+    // Get and render the todos of this project
+    let todos;
+    const subscription = PubSub.subscribe('sendTodosOfProject', function(msg, receivedTodos) {
+        todos = receivedTodos;
+    });
+    PubSub.publishSync('requestTodosOfProject', {type: 'renderTodosForProject', projectId});
+    PubSub.unsubscribe(subscription);
+
+    for (let i = 0; i < todos.length; i++) {
+        // NEED TO RENDER THEM AS FINISHED IF THEY ARE FUKKKKKKKKKKKKKK
+        renderTodo(todos[i].id, todos[i].title, todos[i].dueDate, 
+                   todos[i].dueDate, todos[i].priority);
+    }
+}
+
+function handleProjectFormData(createOrEdit, idOfProjectToEdit) {
+
+    const subscription = PubSub.subscribe('sendNewProject', function(topicName, projectToRender) {
+
+        const projectsContainer = document.querySelector('.newProjects');
+        const newProjectHeader = document.createElement('p');
+        // console.log(projectValues.title);
+        newProjectHeader.textContent = projectToRender.title;
+        projectsContainer.appendChild(newProjectHeader);
+
+        // add event listener
+
+    });
+
+    const form = document.getElementById('newProjectForm');
+    const title = document.getElementById('projectTitleInput');
+
+    if (title.value) {
+        if (createOrEdit == 'create') {
+            PubSub.publishSync('createProjectToProjectManager', {type: 'createNewProject', title: title.value});
+        } else {
+            // PubSub.publishSync('editProjectToProjectManager', idOfProjectToEdit);
+        }
+    }
+
+    PubSub.unsubscribe(subscription);
+    form.reset();
 
 }
 
@@ -329,11 +389,71 @@ function renderNote() {
 
 function renderScreen() {
     renderAllImages();
+    renderTodosForProject(0);
 }
+
+let currentProject = 0;
 
 function setupListeners() {
     const addTodoButton = document.querySelector('.addTodoButton');
     addTodoButton.addEventListener('click', () => renderTodoModal('create', ""));
+
+    // Set home default project listeners (home, today, and week project tabs)
+
+    const homeProjectButton = document.querySelector('.projectHome');
+    const todayProjectButton = document.querySelector('.projectToday');
+    const weekProjectButton = document.querySelector('.projectWeek');
+
+    homeProjectButton.addEventListener('click', () => {
+        currentProject = 0;
+        renderTodosForProject(0);
+    });
+    todayProjectButton.addEventListener('click', () => {
+        currentProject = 1;
+        renderTodosForProject(1);
+    });
+    weekProjectButton.addEventListener('click', () => {
+        currentProject = 2;
+        renderTodosForProject(2);
+    });
+
+    // Add projects button
+    const addProjectButton = document.querySelector('.addProjectButton');
+    addProjectButton.addEventListener('click', () => {
+
+        // renderAddProjectModal() --> maybe move this somewhere else??
+        // It kind of makes sense to have it here --> less clutter and scrolling
+        // and this function is ONLY called here so it makes sense to put it here
+        const addProjectModal = document.querySelector('.addProjectModal');
+        const modalOverlay = document.querySelector('.modalFullScreenOverlay');
+        addProjectModal.classList.add('show');
+        modalOverlay.classList.add('show');
+
+        // Handle closing or submitting the form
+        const closeIconElement = document.querySelector(".projectCreationCloseIcon");
+        const form = document.getElementById('newProjectForm');
+    
+        // Add listeners to close the modal or submit the form
+        closeIconElement.addEventListener('click', closeModal);
+        form.addEventListener('submit', submitForm);
+    
+        function closeModal() {
+            addProjectModal.classList.remove('show');
+            modalOverlay.classList.remove('show');
+            closeIconElement.removeEventListener('click', closeModal);
+            form.removeEventListener('submit', submitForm);
+            form.reset();
+        }
+    
+        function submitForm(e) {
+            e.preventDefault();
+            handleProjectFormData('create', '');
+            closeModal();
+        }
+        
+    });
+
+    // Notes Button
 }
 
 export {renderScreen, setupListeners}

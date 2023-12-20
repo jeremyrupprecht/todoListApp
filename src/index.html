@@ -12,20 +12,29 @@
                 <p>// TO-DO</p>
             </div>
             <div class="sideBar">
-                <div class="projectHeader homeTab">
+                <div class="projectHeader projectHome">
                     <p>Home</p>
                     <div class="numberOfTodos">
                         <p>5</p>
                     </div>
                 </div>
-                <div class="projectHeader todayTab">
+                <div class="projectHeader projectToday">
                     <p>Today</p>
                 </div>
-                <div class="projectHeader weekTab">
+                <div class="projectHeader projectWeek">
                     <p>Week</p>
                 </div>
                 <div class="projectHeader projects">
                     <p>Projects</p>
+
+                    <div class="projectsSideBarFlexbox">
+                        <div class="newProjects">
+                            <!-- <p>Project1</p>
+                            <p>Project2</p>
+                            <p>Project3</p> -->
+                        </div>
+                        <button class="addProjectButton"></button>
+                    </div>
                 </div>
 
                 <div class="projectHeader Notes">
@@ -127,6 +136,25 @@
                 <p class="detailsDueDate"></p>
                 <p class="detailsDetails"></p>
             </div>
+        </div>
+
+        <div class="addProjectModal">
+            <div class="addProjectModalTitle">
+                <p class="AddProjectModalTitleText">New Project</p>
+            </div>
+            <form action="" class="newProjectForm" id="newProjectForm">
+
+                <div class="formRowProject">
+                    <input type="text" placeholder="Title: Add a Project Name" id="projectTitleInput" required>
+                </div>
+
+                <div class="formRowProject">
+                    <div class="submitButtonDiv">
+                        <button type="submit" class="submitNewProject">ADD NEW PROJECT</button>
+                    </div>
+                </div>
+
+            </form>
         </div>
 
     </div>

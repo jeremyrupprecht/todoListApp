@@ -13,6 +13,17 @@ function createProjectManager() {
         console.log("Project does not Exist!");
     }
 
+    const getAllProjects = () => {
+        const allProjects = []
+        const keys = Object.keys(localStorage);
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i].includes("project")) {
+                allProjects.push(JSON.parse(localStorage.getItem(keys[i])));
+            }
+        }
+        return allProjects;
+    }
+
     // Called WHENEVER a todo is created (every todo must have a parent project)
     const addTodoToProject = (topicName, idOfTodoToAdd) => {
         const todoToAdd = JSON.parse(localStorage.getItem(`todo-${idOfTodoToAdd}`));
@@ -29,14 +40,21 @@ function createProjectManager() {
         localStorage.setItem(`project-${projectToBeRemovedFrom.getProject().id}`, JSON.stringify(projectToBeRemovedFrom.getProject()));
     }
 
-    const createAndSaveProject = (id, title, todoIds) => {
+    const createAndSaveProject = (topicName, requestType) => {
+        const title = requestType.title;
+        const id = getAllProjects().length;
         // Don't allow duplicate id's
         if (localStorage.getItem(`project-${id}`)) {
             console.log("A Project with that id already exists!");
             return
         }
-        const newProject = createProject(id, title, todoIds);
+        const newProject = createProject(id, title, []);
         localStorage.setItem(`project-${id}`, JSON.stringify(newProject.getProject()));
+
+        if (requestType.type == 'createNewProject') {
+            PubSub.publishSync('sendNewProject', newProject);
+            return
+        }
         return newProject;
     }
 
@@ -57,6 +75,7 @@ function createProjectManager() {
     // update its list of todo references (for display later)
     const listenForCreatedTodos = PubSub.subscribe('createTodo', addTodoToProject);
     const listenForDeletedTodos = PubSub.subscribe('deleteTodo', removeTodoFromProject);
+    const listenForCreatedProjects = PubSub.subscribe('createProjectToProjectManager', createAndSaveProject);
 
     return {getProjectFromStorage, addTodoToProject, removeTodoFromProject, createAndSaveProject, editProjectTitle,
             deleteProject}
