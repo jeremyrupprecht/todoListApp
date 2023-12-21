@@ -88,7 +88,7 @@ function createProjectManager() {
     }
 
     // This publishes to the PubSub mediator
-    const deleteProject = (idOfProjectToDelete) => {
+    const deleteProject = (topicName, idOfProjectToDelete) => {
         PubSub.publishSync('deleteProject', idOfProjectToDelete);
         localStorage.removeItem(`project-${idOfProjectToDelete}`);
     }
@@ -102,6 +102,7 @@ function createProjectManager() {
     const listenForRequestedAllProjects = PubSub.subscribe('requestAllProjects', getAllProjects)
     const listenForRequestedProjects = PubSub.subscribe('requestProject', getProjectFromStorage);
     const listenForEditedProjects = PubSub.subscribe('editProjectToProjectManager', editProjectTitle);
+    const listenForDeletedProjects = PubSub.subscribe('deleteProjectFromDOM', deleteProject);
 
 
     return {getProjectFromStorage, addTodoToProject, removeTodoFromProject, createAndSaveProject, editProjectTitle,

@@ -115,9 +115,9 @@ function createTodoManager() {
 
     // Called WHENEVER a project is deleted --> all of it's todos are deleted as well
     const deleteAllTodosForThisProject = (topicName, projectId) => {
-        const todos = getTodosOfThisProject(projectId); 
+        const todos = getTodosOfThisProject('', {type: '', projectId}); 
         for (let i = 0; i < todos.length; i++) {
-            localStorage.removeItem(`todo-${todos[i].getTodo().id}`);
+            localStorage.removeItem(`todo-${todos[i].id}`);
         }
     }
 

@@ -499,6 +499,49 @@ function disableAllOtherButtonsWhileModalActive() {
 
 }
 
+function renderDeleteProjectModal() {
+    
+    // Show modal
+    const deleteProjectModal = document.querySelector('.areYouSureModal');
+    const modalOverlay = document.querySelector('.modalFullScreenOverlay');
+    deleteProjectModal.classList.add('show');
+    modalOverlay.classList.add('show');
+
+    // Render name of the project to be deleted
+
+    // Handle "yes" option
+    const yesButton = deleteProjectModal.querySelector(".yesButton");
+    yesButton.addEventListener('click', handleDeleteProject);
+
+    // Handle "no" option
+    const noButton = deleteProjectModal.querySelector('.noButton');
+    noButton.addEventListener('click', closeModal);
+
+    function closeModal() {
+        deleteProjectModal.classList.remove('show');
+        modalOverlay.classList.remove('show');
+        yesButton.removeEventListener('click', handleDeleteProject);
+        noButton.removeEventListener('click', closeModal);   
+    }
+
+    function handleDeleteProject() {
+
+        // PubSub to delete project from database
+        const idOfProjectToDelete = currentProject;
+        PubSub.publishSync('deleteProjectFromDOM', idOfProjectToDelete);
+        
+        // Remove project title from sidebar
+        const projectElementToDelete = document.querySelector(`p[data-id="${idOfProjectToDelete}"]`);
+        projectElementToDelete.remove();
+
+        // Change currently viewed project (AND CURRENT PROJECT VARIABLE) to home 
+        currentProject = 0;
+        renderTodosForProject(0);
+
+        closeModal();
+    }
+}
+
 let currentProject = 0;
 
 function setupListeners() {
@@ -537,6 +580,11 @@ function setupListeners() {
     editProjectButton.addEventListener('click', () => {
         renderProjectModal('edit');
     });
+
+    deleteProjectButton.addEventListener('click', () => {
+        renderDeleteProjectModal();
+    });
+
 
     // Notes Button
 }
