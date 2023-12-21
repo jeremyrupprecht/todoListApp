@@ -180,7 +180,6 @@ PubSub.subscribe('renderEditedTodo', function(msg, valuesToRender) {
 });
 
 // Maybe refactor element creation --> bring back helper methods from last project
-
 function renderTodo(id, title, details, dueDate, priority) {
 
     // Create Elements
@@ -258,13 +257,21 @@ function renderTodo(id, title, details, dueDate, priority) {
     // Present details to user
     detailsButton.addEventListener('click', function () {
 
+        // Get todo details from todo manager
         let todoValues;
-        const subscription = PubSub.subscribe('sendTodo', function(topicName, values) {
+        const getTodoValues = PubSub.subscribe('sendTodo', function(topicName, values) {
             todoValues = values;
         });
         PubSub.publishSync('requestTodo', id);
-        PubSub.unsubscribe(subscription);
+        PubSub.unsubscribe(getTodoValues);
 
+        // Get todo's parent project title from project manager
+        let parentProjectTitle;
+        const getParentProjectTitle = PubSub.subscribe('sendProject', function(topicName, project) {
+            parentProjectTitle = project.title;
+        });
+        PubSub.publishSync('requestProject', {type: 'requestProject', id: todoValues.parentProjectId});
+        PubSub.unsubscribe(getParentProjectTitle);
         
         const detailsModal = document.querySelector('.detailsModal');
         const modalOverlay = document.querySelector('.modalFullScreenOverlay');
@@ -279,7 +286,7 @@ function renderTodo(id, title, details, dueDate, priority) {
         const closeButtonElement = document.querySelector('.detailsCloseButton');
 
         titleElement.textContent = todoValues.title;
-        projectElement.textContent = 'NEED TO IMPLEMENT';
+        projectElement.textContent = parentProjectTitle;
         priorityElement.textContent = todoValues.priority;
         dueDateElement.textContent = todoValues.dueDate;
         detailsElement.textContent = todoValues.details;
@@ -307,6 +314,7 @@ function renderTodo(id, title, details, dueDate, priority) {
 
 function renderFinishedTodo(todoId, finished) {
     const todoElement = document.querySelector(`.todoItem[data-id="${todoId}"]`);
+    const checkBox = todoElement.querySelector('#todoFinished');
     const title = todoElement.querySelector('.todoTitle');
     const details = todoElement.querySelector('.todoDetails');
     const dueDate = todoElement.querySelector('.todoDueDate');
@@ -314,12 +322,14 @@ function renderFinishedTodo(todoId, finished) {
     const deleteButton = todoElement.querySelector('.deleteTodoButton');
 
     if (finished) {
+        checkBox.checked = true;
         title.classList.add('titleFinished');
         details.classList.add('detailsFinished');
         dueDate.classList.add('dueDateFinished');
         editButton.childNodes[0].src = editIconGray;
         deleteButton.childNodes[0].src = trashIconGray;
     } else {
+        checkBox.checked = false;
         title.classList.remove('titleFinished');
         details.classList.remove('detailsFinished');
         dueDate.classList.remove('dueDateFinished');
@@ -330,22 +340,54 @@ function renderFinishedTodo(todoId, finished) {
 
 function renderTodosForProject(projectId) {
 
+    // Highlight (add "//") to current project title header
+    const allProjectTitleHeaders = document.querySelectorAll(`p[data-project-id]`);
+    for (let i = 0; i < allProjectTitleHeaders.length; i++) {
+        if (allProjectTitleHeaders[i].textContent.startsWith('// ')) {
+            allProjectTitleHeaders[i].textContent = (allProjectTitleHeaders[i].textContent).substring(3);
+        }
+    }
+    const projectTitleHeader = document.querySelector(`p[data-project-id="${projectId}"]`);
+    projectTitleHeader.textContent = `// ${projectTitleHeader.textContent}`
+
     // Clear any existing todos
     const todoContainer = document.querySelector('.todoContainer');
     todoContainer.innerHTML = '';
-    
+
     // Get and render the todos of this project
-    let todos;
-    const subscription = PubSub.subscribe('sendTodosOfProject', function(msg, receivedTodos) {
-        todos = receivedTodos;
-    });
-    PubSub.publishSync('requestTodosOfProject', {type: 'renderTodosForProject', projectId});
-    PubSub.unsubscribe(subscription);
+    let todos = [];
+    
+    // The today and week projects are special in that they only display todos
+    // from other projects based on their dueDate
+    if (projectId == 1) {
+        const subscription = PubSub.subscribe('sendTodosOfToday', function(msg, receivedTodos) {
+            todos = receivedTodos;
+        });
+        PubSub.publishSync('requestTodosOfToday');
+        PubSub.unsubscribe(subscription);
+    } else if (projectId == 2) {
+
+        const subscription = PubSub.subscribe('sendTodosOfThisWeek', function(msg, receivedTodos) {
+            todos = receivedTodos;
+        });
+        PubSub.publishSync('requestTodosOfThisWeek');
+        PubSub.unsubscribe(subscription);
+
+    } else {
+        const subscription = PubSub.subscribe('sendTodosOfProject', function(msg, receivedTodos) {
+            todos = receivedTodos;
+        });
+        PubSub.publishSync('requestTodosOfProject', {type: 'renderTodosForProject', projectId});
+        PubSub.unsubscribe(subscription);
+    }
 
     for (let i = 0; i < todos.length; i++) {
-        // NEED TO RENDER THEM AS FINISHED IF THEY ARE FUKKKKKKKKKKKKKK
         renderTodo(todos[i].id, todos[i].title, todos[i].dueDate, 
                    todos[i].dueDate, todos[i].priority);
+
+        if (todos[i].isFinished) {
+            renderFinishedTodo(todos[i].id, 1);
+        }
     }
 
     // Only user created projects (every project excluding home, today and week)
@@ -362,6 +404,10 @@ function renderTodosForProject(projectId) {
     }
 }
 
+function renderTodosForThisDate(date) {
+
+}
+
 function handleProjectFormData(createOrEdit) {
 
     const getAndRenderNewProject = PubSub.subscribe('sendNewProject', function(topicName, projectToRender) {
@@ -369,7 +415,7 @@ function handleProjectFormData(createOrEdit) {
     });
 
     const getAndRenderEditedProject = PubSub.subscribe('sendEditedProject', function(topicName, projectToRender) {
-        const projectElement = document.querySelector(`p[data-id="${projectToRender.id}"]`);
+        const projectElement = document.querySelector(`p[data-project-id="${projectToRender.id}"]`);
         projectElement.textContent = projectToRender.title;
     });
 
@@ -393,7 +439,7 @@ function renderProject(projectId, title) {
     const projectsContainer = document.querySelector('.newProjects');
     const newProjectHeader = document.createElement('p');
     newProjectHeader.textContent = title;
-    newProjectHeader.setAttribute('data-id', projectId);
+    newProjectHeader.setAttribute('data-project-id', projectId);
     projectsContainer.appendChild(newProjectHeader);
 
     // add event listener
@@ -531,7 +577,7 @@ function renderDeleteProjectModal() {
         PubSub.publishSync('deleteProjectFromDOM', idOfProjectToDelete);
         
         // Remove project title from sidebar
-        const projectElementToDelete = document.querySelector(`p[data-id="${idOfProjectToDelete}"]`);
+        const projectElementToDelete = document.querySelector(`p[data-project-id="${idOfProjectToDelete}"]`);
         projectElementToDelete.remove();
 
         // Change currently viewed project (AND CURRENT PROJECT VARIABLE) to home 

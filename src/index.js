@@ -13,38 +13,40 @@ function preloadData(todoManager, projectManager, noteManager) {
     if (!localStorage.getItem('todo-0')) {
         console.log("preloading data...");
 
-        const date1 = format(new Date(1995, 0, 14), 'yyyy-MM-dd');
-        const date2 = format(new Date(1995, 0, 16), 'yyyy-MM-dd');
+        const date0 = format(new Date(2023, 11, 21), 'yyyy-MM-dd');
+        const date1 = format(new Date(2023, 11, 20), 'yyyy-MM-dd');
+        const date2 = format(new Date(2023, 11, 16), 'yyyy-MM-dd');
+        const date3 = format(new Date(2023, 11, 24), 'yyyy-MM-dd');
 
         // Set up a loop for these
 
-        const values0 = {title: 'TODO 0', details: 'DETAILS0', dueDate: date1, 
+        const values0 = {title: 'TODO 0', details: 'DETAILS0', dueDate: date0, 
         priority: 'low', isFinished: false, parentProjectId: 0};
         PubSub.publishSync('createTodoToTodoManager', values0);
 
-        const values1 = {title: 'TODO 1', details: 'DETAILS11', dueDate: date2, 
+        const values1 = {title: 'TODO 1', details: 'DETAILS11', dueDate: date1, 
         priority: 'medium', isFinished: false, parentProjectId: 0};
         PubSub.publishSync('createTodoToTodoManager', values1);
 
-        const values2 = {title: 'TODO 2', details: 'DETAILS22', dueDate: date1, 
+        const values2 = {title: 'TODO 2', details: 'DETAILS22', dueDate: date2, 
         priority: 'high', isFinished: false, parentProjectId: 0};
         PubSub.publishSync('createTodoToTodoManager', values2);
 
-        const values3 = {title: 'TODO 3', details: 'DETAILS33', dueDate: date1, 
+        const values3 = {title: 'TODO 3', details: 'DETAILS33', dueDate: date3, 
         priority: 'low', isFinished: false, parentProjectId: 0};
         PubSub.publishSync('createTodoToTodoManager', values3);
 
-        const values4 = {title: 'TODO 4', details: 'DETAILS44', dueDate: date1, 
-        priority: 'low', isFinished: false, parentProjectId: 1};
-        PubSub.publishSync('createTodoToTodoManager', values4);
+        // const values4 = {title: 'TODO 4', details: 'DETAILS44', dueDate: date1, 
+        // priority: 'low', isFinished: false, parentProjectId: 1};
+        // PubSub.publishSync('createTodoToTodoManager', values4);
 
-        const values5 = {title: 'TODO 5', details: 'DETAILS55', dueDate: date1, 
-        priority: 'low', isFinished: false, parentProjectId: 1};
-        PubSub.publishSync('createTodoToTodoManager', values5);
+        // const values5 = {title: 'TODO 5', details: 'DETAILS55', dueDate: date1, 
+        // priority: 'low', isFinished: false, parentProjectId: 1};
+        // PubSub.publishSync('createTodoToTodoManager', values5);
 
-        const values6 = {title: 'TODO 6', details: 'DETAILS66', dueDate: date1, 
-        priority: 'low', isFinished: false, parentProjectId: 2};
-        PubSub.publishSync('createTodoToTodoManager', values6);
+        // const values6 = {title: 'TODO 6', details: 'DETAILS66', dueDate: date1, 
+        // priority: 'low', isFinished: false, parentProjectId: 2};
+        // PubSub.publishSync('createTodoToTodoManager', values6);
     }
 }
 

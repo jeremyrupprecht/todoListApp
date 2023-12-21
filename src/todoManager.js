@@ -1,7 +1,7 @@
-import { compareAsc } from "date-fns";
+// import { compareAsc, startOfWeek } from "date-fns";
 import { createTodo } from "./todo";
 import { PubSub } from 'pubsub-js';
-import { parseISO } from 'date-fns';
+import { parseISO, format, startOfToday, startOfWeek, endOfWeek} from 'date-fns';
 
 function createTodoManager() {
 
@@ -26,6 +26,33 @@ function createTodoManager() {
         const todosBeforeThisDate = allTodos.filter((todo) => 
         parseISO(todo.dueDate).getTime() <= parseISO(date).getTime());
         return todosBeforeThisDate;
+    }
+
+    const getAllTodosDueToday = () => {
+        const allTodos = getAllTodos();
+        const today = format(startOfToday(), 'yyyy-MM-dd');
+        const allTodosDueToday = [];
+        for (let i = 0; i < allTodos.length; i++) {
+            if (today == allTodos[i].dueDate) {
+                allTodosDueToday.push(allTodos[i]);
+            }
+        }
+        return allTodosDueToday;
+    }
+
+    const getAllTodosDueThisWeek = () => {
+        const allTodos = getAllTodos();
+        const allTodosDueThisWeek = [];
+        const weekStart = format(startOfWeek(startOfToday()), 'yyyy-MM-dd');
+        const weekEnd = format(endOfWeek(startOfToday()), 'yyyy-MM-dd');
+
+        for (let i = 0; i < allTodos.length; i++) {
+            if (weekStart < allTodos[i].dueDate && 
+                allTodos[i].dueDate < weekEnd) {
+                allTodosDueThisWeek.push(allTodos[i]);
+            }
+        }
+        return allTodosDueThisWeek;
     }
     
     const getTodosOfThisProject = (topicName, requestType) => {
@@ -130,6 +157,15 @@ function createTodoManager() {
     const listenForEditedTodos = PubSub.subscribe('editTodoToTodoManager', editTodo);
     const listenForRequestedTodo = PubSub.subscribe('requestTodo', getTodo);
     const listenForRequestedTodosOfAProject = PubSub.subscribe('requestTodosOfProject', getTodosOfThisProject);
+    const listenForRequestedTodosForToday = PubSub.subscribe('requestTodosOfToday', function(topicName) {
+        const todos = getAllTodosDueToday();
+        PubSub.publishSync('sendTodosOfToday', todos);
+    });
+
+    const listenForRequestedTodosForThisWeek = PubSub.subscribe('requestTodosOfThisWeek', function(topicName) {
+        const todos = getAllTodosDueThisWeek();
+        PubSub.publishSync('sendTodosOfThisWeek', todos);
+    })
     
 
     return {getAllTodos, getAllTodosDueBeforeThisDate, getTodosOfThisProject, createAndSaveTodo, editTodo, deleteTodo}
