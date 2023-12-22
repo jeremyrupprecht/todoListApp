@@ -19,22 +19,14 @@ function createProjectManager() {
         console.log("Project does not Exist!");
     }
 
-    const getAllProjects = (topicId, requestType) => {
+    const getAllProjects = () => {
         const allProjects = [];
         const keys = Object.keys(localStorage);
         for (let i = 0; i < keys.length; i++) {
-            if (keys[i].includes("project")) {
+            if (keys[i].includes("project-")) {
                 allProjects.push(JSON.parse(localStorage.getItem(keys[i])));
             }
         }
-
-        if (requestType) {
-            if (requestType.type = 'renderProjects') {
-                PubSub.publishSync('sendAllProjects', allProjects);
-                return
-            }
-        }
-
         return allProjects;
     }
 
@@ -56,12 +48,23 @@ function createProjectManager() {
 
     const createAndSaveProject = (topicName, requestType) => {
         const title = requestType.title;
-        const id = getAllProjects('', '').length;
-        // Don't allow duplicate id's
-        if (localStorage.getItem(`project-${id}`)) {
-            console.log("A Project with that id already exists!");
-            return
+
+        // Give the project an id (this id does not decrease if a project is 
+        // deleted, to prevent duplicate ids)
+        let id = localStorage.getItem('projectIdCount');
+        if (!id) {
+            localStorage.setItem('projectIdCount', 0);
+            id = 0;
+        } else {
+            id++;
+            // Double check to not allow duplicate id's
+            if (localStorage.getItem(`project-${id}`)) {
+                console.log("A Project with that id already exists!");
+                return
+            }
+            localStorage.setItem('projectIdCount', id);
         }
+
         const newProject = createProject(id, title, []);
         localStorage.setItem(`project-${id}`, JSON.stringify(newProject.getProject()));
 
@@ -83,8 +86,6 @@ function createProjectManager() {
         if (requestType.type == 'editProjectTitle') {
             PubSub.publishSync('sendEditedProject', projectToEdit);
         }
-
-
     }
 
     // This publishes to the PubSub mediator
@@ -99,7 +100,10 @@ function createProjectManager() {
     const listenForCreatedTodos = PubSub.subscribe('createTodo', addTodoToProject);
     const listenForDeletedTodos = PubSub.subscribe('deleteTodo', removeTodoFromProject);
     const listenForCreatedProjects = PubSub.subscribe('createProjectToProjectManager', createAndSaveProject);
-    const listenForRequestedAllProjects = PubSub.subscribe('requestAllProjects', getAllProjects)
+    const listenForRequestedAllProjects = PubSub.subscribe('requestAllProjects', function(topicName) {
+        const allProjects = getAllProjects();
+        PubSub.publishSync('sendAllProjects', allProjects);
+    });
     const listenForRequestedProjects = PubSub.subscribe('requestProject', getProjectFromStorage);
     const listenForEditedProjects = PubSub.subscribe('editProjectToProjectManager', editProjectTitle);
     const listenForDeletedProjects = PubSub.subscribe('deleteProjectFromDOM', deleteProject);

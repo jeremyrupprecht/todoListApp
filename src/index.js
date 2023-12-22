@@ -10,8 +10,8 @@ function preloadData(todoManager, projectManager, noteManager) {
     // Need to load template todos if there are none (like when the user first
     // opens the site)
 
-    if (!localStorage.getItem('todo-0')) {
-        console.log("preloading data...");
+    if (!localStorage.getItem('todoIdCount') ) {
+        console.log("empty local storage detected, preloading data...");
 
         const date0 = format(new Date(2023, 11, 21), 'yyyy-MM-dd');
         const date1 = format(new Date(2023, 11, 20), 'yyyy-MM-dd');

@@ -67,13 +67,23 @@ function createTodoManager() {
             PubSub.publishSync('sendTodosOfProject', todosToReturn);
             return
         }
+        return todosToReturn;
+    }
 
+    const getUnfinishedTodosOfThisProject = (projectId) => {
+        const retrievedIds = JSON.parse(localStorage.getItem(`project-${projectId}`)).todoIds;
+        const todosToReturn = [];
+        for (let i = 0; i < retrievedIds.length; i++) {
+            const retrievedTodo = JSON.parse(localStorage.getItem(`todo-${retrievedIds[i]}`))
+            if (!retrievedTodo.isFinished) {
+                todosToReturn.push(retrievedTodo)
+            }
+        }
         return todosToReturn;
     }
 
     // This publishes to the PubSub mediator
     const createAndSaveTodo = (topicName, todoValues) => {
-        
         const title = todoValues.title;
         const details = todoValues.details;
         const dueDate = todoValues.dueDate;
@@ -81,12 +91,22 @@ function createTodoManager() {
         const isFinished = todoValues.isFinished;
         const parentProjectId = todoValues.parentProjectId;
 
-        const id = getAllTodos().length;
-        // Don't allow duplicate id's
-        if (localStorage.getItem(`todo-${id}`)) {
-            console.log("A Todo with that id already exists!");
-            return
+        // Give the todo an id (this id does not decrease if a todo is 
+        // deleted, to prevent duplicate ids)
+        let id = localStorage.getItem('todoIdCount');
+        if (!id) {
+            localStorage.setItem('todoIdCount', 0);
+            id = 0;
+        } else {
+            id++;
+            // Double check to not allow duplicate id's
+            if (localStorage.getItem(`todo-${id}`)) {
+                console.log("A todo with that id already exists!");
+                return
+            }
+            localStorage.setItem('todoIdCount', id);
         }
+
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished, parentProjectId);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
 
@@ -157,15 +177,27 @@ function createTodoManager() {
     const listenForEditedTodos = PubSub.subscribe('editTodoToTodoManager', editTodo);
     const listenForRequestedTodo = PubSub.subscribe('requestTodo', getTodo);
     const listenForRequestedTodosOfAProject = PubSub.subscribe('requestTodosOfProject', getTodosOfThisProject);
-    const listenForRequestedTodosForToday = PubSub.subscribe('requestTodosOfToday', function(topicName) {
-        const todos = getAllTodosDueToday();
+    const listenForRequestedTodosForToday = PubSub.subscribe('requestTodosOfToday', function(topicName, requestType) {
+        let todos = getAllTodosDueToday();
+        if (requestType.type = 'unfinished') {
+            todos = todos.filter((todo) => !todo.isFinished);
+            PubSub.publishSync('sendUnfinishedTodosOfToday', todos);
+        } 
         PubSub.publishSync('sendTodosOfToday', todos);
     });
-
-    const listenForRequestedTodosForThisWeek = PubSub.subscribe('requestTodosOfThisWeek', function(topicName) {
-        const todos = getAllTodosDueThisWeek();
+    const listenForRequestedTodosForThisWeek = PubSub.subscribe('requestTodosOfThisWeek', function(topicName, requestType) {
+        let todos = getAllTodosDueThisWeek();
+        if (requestType.type = 'unfinished') {
+            todos = todos.filter((todo) => !todo.isFinished);
+            PubSub.publishSync('sendUnfinishedTodosOfThisWeek', todos);
+        } 
         PubSub.publishSync('sendTodosOfThisWeek', todos);
-    })
+    });
+
+    const listenForRequestedUnfinishedTodosOfAProject = PubSub.subscribe('requestUnfinishedTodosOfThisProject', (topicName, projectId) => {
+        const todos = getUnfinishedTodosOfThisProject(projectId);
+        PubSub.publishSync('sendUnfinishedTodos', todos);
+    });
     
 
     return {getAllTodos, getAllTodosDueBeforeThisDate, getTodosOfThisProject, createAndSaveTodo, editTodo, deleteTodo}

@@ -128,7 +128,6 @@ function populateTodoFormWithExistingData(idOfTodoToEdit) {
     PubSub.unsubscribe(subscription);
 }
 
-// PUT THIS IN IT'S OWN MODULE LATER?
 function handleTodoFormData(createOrEdit, idOfTodoToEdit) {
     const form = document.getElementById('newNoteForm');
     const title = document.getElementById('titleInput');
@@ -150,36 +149,39 @@ function handleTodoFormData(createOrEdit, idOfTodoToEdit) {
                         parentProjectId: currentProject};
     if (title.value) {
         if (createOrEdit == 'create') {
+
+            const getTodoValuesSubscription = PubSub.subscribe('assignTodo', function(msg, valuesToRender) {
+                renderTodo(valuesToRender.id, valuesToRender.title, valuesToRender.details, 
+                    valuesToRender.dueDate, valuesToRender.priority);
+            });
             PubSub.publishSync('createTodoToTodoManager', todoValues);
+            PubSub.unsubscribe(getTodoValuesSubscription);
+
         } else {
+
+            const editTodoValuesSubscription = PubSub.subscribe('renderEditedTodo', function(msg, valuesToRender) {
+                const todoElement = document.querySelector(`.todoItem[data-id="${valuesToRender.id}"]`);
+                const priorityElement = todoElement.querySelector('.todoPriority');
+                const titleElement = todoElement.querySelector('.todoTitle');
+                const dueDateElement = todoElement.querySelector('.todoDueDate');
+            
+                priorityElement.style.backgroundColor = valuesToRender.priority == 'low' 
+                ? 'green' : valuesToRender.priority == 'medium' ? 'orange' : 'red'; 
+            
+                titleElement.innerText = valuesToRender.title;
+            
+                const date = parse(valuesToRender.dueDate, 'yyyy-MM-dd', new Date());
+                const date2 = format(date, 'MMM do');
+                dueDateElement.innerText = date2;
+            });
             PubSub.publishSync('editTodoToTodoManager', todoValues);
+            PubSub.unsubscribe(editTodoValuesSubscription);
         }
     }
+    renderTodoCounts();
     form.reset();
 }
 
-PubSub.subscribe('assignTodo', function(msg, valuesToRender) {
-    renderTodo(valuesToRender.id, valuesToRender.title, valuesToRender.details, 
-        valuesToRender.dueDate, valuesToRender.priority);
-});
-
-PubSub.subscribe('renderEditedTodo', function(msg, valuesToRender) {
-    const todoElement = document.querySelector(`.todoItem[data-id="${valuesToRender.id}"]`);
-    const priorityElement = todoElement.querySelector('.todoPriority');
-    const titleElement = todoElement.querySelector('.todoTitle');
-    const dueDateElement = todoElement.querySelector('.todoDueDate');
-
-    priorityElement.style.backgroundColor = valuesToRender.priority == 'low' 
-    ? 'green' : valuesToRender.priority == 'medium' ? 'orange' : 'red'; 
-
-    titleElement.innerText = valuesToRender.title;
-
-    const date = parse(valuesToRender.dueDate, 'yyyy-MM-dd', new Date());
-    const date2 = format(date, 'MMM do');
-    dueDateElement.innerText = date2;
-});
-
-// Maybe refactor element creation --> bring back helper methods from last project
 function renderTodo(id, title, details, dueDate, priority) {
 
     // Create Elements
@@ -248,9 +250,12 @@ function renderTodo(id, title, details, dueDate, priority) {
         if (this.checked) {
             PubSub.publishSync('finishTodo', {finished: 1, id});
             renderFinishedTodo(id, 1);
+            renderTodoCounts();
+
         } else {
             PubSub.publishSync('finishTodo', {finished: 0, id});
             renderFinishedTodo(id, 0);
+            renderTodoCounts();
         }
     });
     
@@ -299,7 +304,6 @@ function renderTodo(id, title, details, dueDate, priority) {
         }
     });
 
-    // Edit todo values
     editTodoButton.addEventListener('click', function() {
         renderTodoModal('edit', id);
     });
@@ -307,6 +311,8 @@ function renderTodo(id, title, details, dueDate, priority) {
     deleteTodoButton.addEventListener('click', function() {
         PubSub.publishSync('deleteTodoToTodoManager', id);
         todoItem.remove();
+        renderTodoCounts();
+
     });
     
     todoContainer.appendChild(todoItem);
@@ -363,14 +369,14 @@ function renderTodosForProject(projectId) {
         const subscription = PubSub.subscribe('sendTodosOfToday', function(msg, receivedTodos) {
             todos = receivedTodos;
         });
-        PubSub.publishSync('requestTodosOfToday');
+        PubSub.publishSync('requestTodosOfToday', {});
         PubSub.unsubscribe(subscription);
     } else if (projectId == 2) {
 
         const subscription = PubSub.subscribe('sendTodosOfThisWeek', function(msg, receivedTodos) {
             todos = receivedTodos;
         });
-        PubSub.publishSync('requestTodosOfThisWeek');
+        PubSub.publishSync('requestTodosOfThisWeek', {});
         PubSub.unsubscribe(subscription);
 
     } else {
@@ -402,14 +408,77 @@ function renderTodosForProject(projectId) {
         editProjectButton.classList.remove('show');
         deleteProjectButton.classList.remove('show');
     }
+
+    // The today and week projects (not the home project) CANNOT have todos directly
+    // added to them (the today and week projects only display todos from OTHER projects
+    // due at those dates)
+
+    const addTodoButton = document.querySelector('.addTodoButton');
+    if (projectId == 1 || projectId == 2) {
+        addTodoButton.classList.remove('show');
+    } else {
+        addTodoButton.classList.add('show');
+    }
 }
 
-function renderTodosForThisDate(date) {
+function renderTodoCounts() {
+    // Get all projects from project manager, as in the greatest case, every
+    // project's count needs to be displayed upon start up (or page refresh)
+    // and in the least case, a single project's count needs to be updated
+    let allProjects = [];
+    const getAllProjectsSubscription = PubSub.subscribe('sendAllProjects', function(msg, receivedProjects) {
+        allProjects = receivedProjects;
+    });
+    PubSub.publishSync('requestAllProjects');
+    PubSub.unsubscribe(getAllProjectsSubscription);
 
+    for (let i = 0; i < allProjects.length; i++) {
+
+        // Grab number of unfinished todos for this project
+        let unfinishedTodosCount = 0;
+
+        if (allProjects[i].id == 1) {
+
+            const getUnfinishedTodosOfThisProject = PubSub.subscribe('sendUnfinishedTodosOfToday', function(msg, receivedTodos) {
+                unfinishedTodosCount = receivedTodos.length;
+            });
+            PubSub.publishSync('requestTodosOfToday', {type: 'unfinished'});
+            PubSub.unsubscribe(getUnfinishedTodosOfThisProject);
+
+        } else if (allProjects[i].id == 2) {
+
+            const getUnfinishedTodosOfThisProject = PubSub.subscribe('sendUnfinishedTodosOfThisWeek', function(msg, receivedTodos) {
+                unfinishedTodosCount = receivedTodos.length;
+            });
+            PubSub.publishSync('requestTodosOfThisWeek', {type: 'unfinished'});
+            PubSub.unsubscribe(getUnfinishedTodosOfThisProject);
+
+        } else {
+            const getUnfinishedTodosOfThisProject = PubSub.subscribe('sendUnfinishedTodos', function(msg, receivedTodos) {
+                unfinishedTodosCount = receivedTodos.length;
+            });
+            PubSub.publishSync('requestUnfinishedTodosOfThisProject', allProjects[i].id);
+            PubSub.unsubscribe(getUnfinishedTodosOfThisProject);
+        }
+
+        // Then display the number of unfinished todos for this project
+
+        const projectContainer = document.querySelector(`p[data-project-id="${allProjects[i].id}"]`).parentNode;
+        const todoCountContainer = projectContainer.querySelector('.todoCountContainer');
+
+        if (unfinishedTodosCount > 0) {
+            // Display unfinished todo count
+            todoCountContainer.classList.add('show');
+            const todoCount = projectContainer.querySelector('.todoCount');
+            todoCount.textContent = unfinishedTodosCount;
+
+        } else {
+            todoCountContainer.classList.remove('show');
+        }
+    }
 }
 
 function handleProjectFormData(createOrEdit) {
-
     const getAndRenderNewProject = PubSub.subscribe('sendNewProject', function(topicName, projectToRender) {
         renderProject(projectToRender.id, projectToRender.title);
     });
@@ -430,18 +499,33 @@ function handleProjectFormData(createOrEdit) {
             PubSub.publishSync('editProjectToProjectManager',{type: 'editProjectTitle',id: idOfProjectToEdit, title: title.value});
         }
     }
-
     PubSub.unsubscribe(getAndRenderNewProject);
+    PubSub.unsubscribe(getAndRenderEditedProject);
     form.reset();
 }
 
 function renderProject(projectId, title) {
     const projectsContainer = document.querySelector('.newProjects');
+    
+    const newProjectContainer = document.createElement('div');
+    newProjectContainer.classList.add('newProjectContainer');
+
     const newProjectHeader = document.createElement('p');
     newProjectHeader.textContent = title;
     newProjectHeader.setAttribute('data-project-id', projectId);
-    projectsContainer.appendChild(newProjectHeader);
 
+    const todoCountContainer = document.createElement('div');
+    todoCountContainer.classList.add('todoCountContainer');
+
+    const todoCount = document.createElement('p');
+    todoCount.classList.add('todoCount');
+
+    newProjectContainer.appendChild(newProjectHeader);
+    newProjectContainer.appendChild(todoCountContainer);
+    todoCountContainer.appendChild(todoCount);
+
+    projectsContainer.appendChild(newProjectContainer);
+    
     // add event listener
     newProjectHeader.addEventListener('click', () => {
         currentProject = projectId;
@@ -454,13 +538,13 @@ function renderExistingProjects() {
     // There are 3 default projects (home, today, and week), with ids 0,1 and 2
     // respectively, if there are other existing projects, their id's start 
     // counting up from 3
-    if (localStorage.getItem('project-3')) {
+    if (localStorage.getItem('projectIdCount') > 2) {
 
-        let projects;
+        let projects = [];
         const subscription = PubSub.subscribe('sendAllProjects', function(msg, receivedProjects) {
             projects = receivedProjects;
         });
-        PubSub.publishSync('requestAllProjects', {type: 'renderProjects'});
+        PubSub.publishSync('requestAllProjects');
         PubSub.unsubscribe(subscription);
 
         for (let i = 0; i < projects.length; i++) {
@@ -519,7 +603,6 @@ function renderProjectModal(createOrEdit) {
     modalTitle.innerText = "Edit Project";
     submitButton.innerText = "CONFIRM EDIT";
     populateProjectFormWithExistingTitle();
-
 }
 
 function populateProjectFormWithExistingTitle() {
@@ -538,8 +621,8 @@ function renderScreen() {
     renderAllImages();
     renderTodosForProject(0);
     renderExistingProjects();
+    renderTodoCounts();
 }
-
 
 function disableAllOtherButtonsWhileModalActive() {
 
@@ -554,6 +637,10 @@ function renderDeleteProjectModal() {
     modalOverlay.classList.add('show');
 
     // Render name of the project to be deleted
+    const idOfProjectToDelete = currentProject;
+
+    // NEED TO REWORK THE GET PROJECT FROM STORGAGE METHODDDDDD
+
 
     // Handle "yes" option
     const yesButton = deleteProjectModal.querySelector(".yesButton");
@@ -572,17 +659,21 @@ function renderDeleteProjectModal() {
 
     function handleDeleteProject() {
 
-        // PubSub to delete project from database
-        const idOfProjectToDelete = currentProject;
+        // Delete project from database
         PubSub.publishSync('deleteProjectFromDOM', idOfProjectToDelete);
         
-        // Remove project title from sidebar
+        // Remove project element from sidebar
         const projectElementToDelete = document.querySelector(`p[data-project-id="${idOfProjectToDelete}"]`);
-        projectElementToDelete.remove();
+        const projectElementContainer = projectElementToDelete.parentElement;
+        projectElementContainer.remove();
 
         // Change currently viewed project (AND CURRENT PROJECT VARIABLE) to home 
         currentProject = 0;
         renderTodosForProject(0);
+
+        // Update todo counts (for this project and today and week of the 
+        // project had any todos that were presented there)
+        renderTodoCounts();
 
         closeModal();
     }

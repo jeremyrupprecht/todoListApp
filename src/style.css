@@ -65,8 +65,10 @@ button {
 
     display: flex;
     flex-direction: column;
-    padding: 50px;
+    padding: 50px 50px 50px 50px;
     gap: 20px;
+
+    /* border: 1px solid white; */
 }
 
 
@@ -80,21 +82,25 @@ button {
     /* border: 1px solid white; */
 }
 
-.numberOfTodos {
+.todoCountContainer {
     margin-left: auto;
-    height: 1.6rem;
-    width: 1.6rem;
-    border-radius: 15px;
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 50%;
 
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     background-color: black;
 }
 
-/* .numberOfTodos > p {
+.todoCountContainer.show {
+    display: flex;
+}
 
-} */
+.todoCount {
+    margin-top: 1px;
+}
 
 .projectsSideBarFlexbox {
     display: flex;
@@ -110,15 +116,25 @@ button {
 .newProjects {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+    /* border: 1px solid white; */
 }
 
-.newProjects > p {
+.newProjectContainer {
+    display: grid;
+    grid-template: auto / 1fr 1.8rem;
+}
+
+.newProjectContainer > p {
     font-size: 1.3rem;
     cursor: pointer;
+    word-break: break-all;
+    display: flex;
+    justify-content: space-between;
+    padding-right: 25px;
 }
 
-.newProjects > p:last-child {
+.newProjects > div:last-child {
     margin-bottom: 20px;
 }
 
@@ -259,7 +275,11 @@ input[type="checkbox"] {
     display: none;
 }
 
-.editProjectButton.show, .deleteProjectButton.show {
+.addTodoButton {
+    display: none;
+}
+
+.editProjectButton.show, .deleteProjectButton.show, .addTodoButton.show {
     display: block;
 }
 
@@ -565,5 +585,9 @@ input[type="radio"] {
 
     .topBar, .sideBar, .mainSection {
         border-radius: 0px;
+    }
+
+    .sideBar {
+        padding: 50px 25px 50px 50px;
     }
 }

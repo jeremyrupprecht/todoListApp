@@ -8,6 +8,25 @@ function createNoteManager() {
             console.log("A Note with that id already exists!");
             return
         }
+        // NEED TO REFACTOR TO THIS \/ \/ \/ \/ \/ \/
+
+        // // Give the todo an id (this id does not decrease if a todo is 
+        // // deleted, to prevent duplicate ids)
+        // let id = localStorage.getItem('todoIdCount');
+        // if (!id) {
+        //     localStorage.setItem('todoIdCount', 0);
+        //     id = 0;
+        // } else {
+        //     id++;
+        //     // Double check to not allow duplicate id's
+        //     if (localStorage.getItem(`todo-${id}`)) {
+        //         console.log("A todo with that id already exists!");
+        //         return
+        //     }
+        //     localStorage.setItem('todoIdCount', id);
+        // }
+
+
         const newNote = createNote(id, title, details);
         localStorage.setItem(`note-${id}`, JSON.stringify(newNote.getNote()));
         return newNote;
