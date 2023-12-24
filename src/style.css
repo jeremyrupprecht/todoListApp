@@ -177,7 +177,6 @@ button {
     overflow-x: hidden;
     max-height: calc(100vh - 60px);
     flex: 1;
-    /* border: 1px solid white; */
 }
 
 .todoItem {
@@ -185,8 +184,11 @@ button {
     height: 50px;
     width: 95%;
     border-radius: 10px;
-
     display: flex;
+}
+
+.todoItem:hover {
+    transform: scale(1.01);
 }
 
 .todoLeft, .todoRight {
@@ -223,6 +225,13 @@ input[type="checkbox"] {
     font-size: 0.9rem;
 }
 
+.todoDetails:hover {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    transition-duration: 0.3s;
+}
+
 .todoDueDate {
     width: 80px;
     text-align: center;
@@ -230,9 +239,13 @@ input[type="checkbox"] {
 
 .todoButton {
     height: 24px;
-    width: 24px;
+    width: 24px; 
     background: none;
     margin-bottom: 4px;
+}
+
+.todoButton:hover {
+    transform: scale(1.09);
 }
 
 .titleFinished, .dueDateFinished, .buttonFinished, .detailsFinished {
@@ -267,6 +280,10 @@ input[type="checkbox"] {
     background: none;
 }
 
+.footerButton:hover {
+    transform: scale(1.09);
+}
+
 .editProjectButton {
     display: none;
 }
@@ -282,10 +299,6 @@ input[type="checkbox"] {
 .editProjectButton.show, .deleteProjectButton.show, .addTodoButton.show {
     display: block;
 }
-
-/* .footerButton:hover {
-    fill: rgba(255, 255, 255, 0.144);
-} */
 
 .createTodoModal {
 
@@ -312,7 +325,7 @@ input[type="checkbox"] {
     width: 100vw;
     position: absolute;
     background-color: rgba(0, 0, 0, 0.747);
-    pointer-events: none;
+    pointer-events: auto;
     z-index: 1;
 }
 

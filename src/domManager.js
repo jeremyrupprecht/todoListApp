@@ -7,7 +7,6 @@ import plusIcon from './images/plusIcon.svg';
 import closeIcon from './images/closeIcon.svg';
 import {parse, format} from 'date-fns';
 import { PubSub } from 'pubsub-js';
-import { el } from 'date-fns/locale';
 
 function renderAllImages() {
 
@@ -148,13 +147,13 @@ function handleTodoFormData(createOrEdit, idOfTodoToEdit) {
                         priority: priority,
                         parentProjectId: currentProject};
     if (title.value) {
-        if (createOrEdit == 'create') {
+        if (createOrEdit === 'create') {
 
             const getTodoValuesSubscription = PubSub.subscribe('assignTodo', function(msg, valuesToRender) {
                 renderTodo(valuesToRender.id, valuesToRender.title, valuesToRender.details, 
                     valuesToRender.dueDate, valuesToRender.priority);
             });
-            PubSub.publishSync('createTodoToTodoManager', todoValues);
+            PubSub.publishSync('createTodo', todoValues);
             PubSub.unsubscribe(getTodoValuesSubscription);
 
         } else {
@@ -174,7 +173,7 @@ function handleTodoFormData(createOrEdit, idOfTodoToEdit) {
                 const date2 = format(date, 'MMM do');
                 dueDateElement.innerText = date2;
             });
-            PubSub.publishSync('editTodoToTodoManager', todoValues);
+            PubSub.publishSync('editTodo', todoValues);
             PubSub.unsubscribe(editTodoValuesSubscription);
         }
     }
@@ -275,7 +274,7 @@ function renderTodo(id, title, details, dueDate, priority) {
         const getParentProjectTitle = PubSub.subscribe('sendProject', function(topicName, project) {
             parentProjectTitle = project.title;
         });
-        PubSub.publishSync('requestProject', {type: 'requestProject', id: todoValues.parentProjectId});
+        PubSub.publishSync('requestProject', {id: todoValues.parentProjectId});
         PubSub.unsubscribe(getParentProjectTitle);
         
         const detailsModal = document.querySelector('.detailsModal');
@@ -309,12 +308,12 @@ function renderTodo(id, title, details, dueDate, priority) {
     });
 
     deleteTodoButton.addEventListener('click', function() {
-        PubSub.publishSync('deleteTodoToTodoManager', id);
+        PubSub.publishSync('deleteTodo', id);
         todoItem.remove();
         renderTodoCounts();
 
     });
-    
+
     todoContainer.appendChild(todoItem);
 }
 
@@ -346,16 +345,6 @@ function renderFinishedTodo(todoId, finished) {
 
 function renderTodosForProject(projectId) {
 
-    // Highlight (add "//") to current project title header
-    const allProjectTitleHeaders = document.querySelectorAll(`p[data-project-id]`);
-    for (let i = 0; i < allProjectTitleHeaders.length; i++) {
-        if (allProjectTitleHeaders[i].textContent.startsWith('// ')) {
-            allProjectTitleHeaders[i].textContent = (allProjectTitleHeaders[i].textContent).substring(3);
-        }
-    }
-    const projectTitleHeader = document.querySelector(`p[data-project-id="${projectId}"]`);
-    projectTitleHeader.textContent = `// ${projectTitleHeader.textContent}`
-
     // Clear any existing todos
     const todoContainer = document.querySelector('.todoContainer');
     todoContainer.innerHTML = '';
@@ -383,7 +372,7 @@ function renderTodosForProject(projectId) {
         const subscription = PubSub.subscribe('sendTodosOfProject', function(msg, receivedTodos) {
             todos = receivedTodos;
         });
-        PubSub.publishSync('requestTodosOfProject', {type: 'renderTodosForProject', projectId});
+        PubSub.publishSync('requestTodosOfProject', projectId);
         PubSub.unsubscribe(subscription);
     }
 
@@ -494,9 +483,9 @@ function handleProjectFormData(createOrEdit) {
 
     if (title.value) {
         if (createOrEdit == 'create') {
-            PubSub.publishSync('createProjectToProjectManager', {type: 'createNewProject', title: title.value});
+            PubSub.publishSync('createProject', {title: title.value});
         } else {
-            PubSub.publishSync('editProjectToProjectManager',{type: 'editProjectTitle',id: idOfProjectToEdit, title: title.value});
+            PubSub.publishSync('editProject',{id: idOfProjectToEdit, title: title.value});
         }
     }
     PubSub.unsubscribe(getAndRenderNewProject);
@@ -527,10 +516,14 @@ function renderProject(projectId, title) {
     projectsContainer.appendChild(newProjectContainer);
     
     // add event listener
-    newProjectHeader.addEventListener('click', () => {
+    newProjectHeader.addEventListener('click', function() {
         currentProject = projectId;
+        highlightActiveProjectHeader.call(this);
         renderTodosForProject(projectId);
     });
+
+    newProjectHeader.addEventListener('mouseenter', hoverProjectIn);
+    newProjectHeader.addEventListener('mouseleave', hoverProjectOut);
 }
 
 function renderExistingProjects() {
@@ -546,6 +539,9 @@ function renderExistingProjects() {
         });
         PubSub.publishSync('requestAllProjects');
         PubSub.unsubscribe(subscription);
+
+        // Sort the list so the projects appear in order
+        projects.sort((p1, p2) => p1.id - p2.id);
 
         for (let i = 0; i < projects.length; i++) {
             if (projects[i].id > 2) {
@@ -613,7 +609,7 @@ function populateProjectFormWithExistingTitle() {
         const title = document.getElementById('projectTitleInput');
         title.value = project.title;
     });
-    PubSub.publishSync('requestProject', {type: 'requestProject', id: currentProjectid});
+    PubSub.publishSync('requestProject', {id: currentProjectid});
     PubSub.unsubscribe(subscription);
 }
 
@@ -624,10 +620,6 @@ function renderScreen() {
     renderTodoCounts();
 }
 
-function disableAllOtherButtonsWhileModalActive() {
-
-}
-
 function renderDeleteProjectModal() {
     
     // Show modal
@@ -636,11 +628,18 @@ function renderDeleteProjectModal() {
     deleteProjectModal.classList.add('show');
     modalOverlay.classList.add('show');
 
-    // Render name of the project to be deleted
+    // Grab and render project name
     const idOfProjectToDelete = currentProject;
+    let projectTitle = "";
 
-    // NEED TO REWORK THE GET PROJECT FROM STORGAGE METHODDDDDD
+    const subscription = PubSub.subscribe('sendProject', function(topicName, project) {
+        projectTitle = project.title;
+    });
+    PubSub.publishSync('requestProject', {id: idOfProjectToDelete});
+    PubSub.unsubscribe(subscription);
 
+    const projectTitleElement = document.querySelector('.titleOfProjectToDelete');
+    projectTitleElement.textContent = projectTitle;
 
     // Handle "yes" option
     const yesButton = deleteProjectModal.querySelector(".yesButton");
@@ -679,6 +678,38 @@ function renderDeleteProjectModal() {
     }
 }
 
+function hoverProjectIn() {
+    const projectId = this.getAttribute('data-project-id');
+    if (projectId != currentProject && !this.textContent.startsWith('// ')) {
+        this.textContent = `// ${this.textContent}`;
+    }
+}
+
+function hoverProjectOut() {
+    const projectId = this.getAttribute('data-project-id');
+    if (projectId != currentProject && this.textContent.startsWith('// ')) {
+        this.textContent = (this.textContent).substring(3);
+    }
+}
+
+function highlightActiveProjectHeader() {
+    
+    // Clear all other highlighted headers
+    const allProjectTitleHeaders = document.querySelectorAll(`p[data-project-id]`);
+    for (let i = 0; i < allProjectTitleHeaders.length; i++) {
+        if (allProjectTitleHeaders[i].textContent.startsWith('// ')) {
+            allProjectTitleHeaders[i].textContent = (allProjectTitleHeaders[i].textContent).substring(3);
+        }
+    }
+
+    // Highlight the currently active header
+    const projectId = this.getAttribute('data-project-id');
+    if (projectId == currentProject && !this.textContent.startsWith('// ')) {
+        this.textContent = `// ${this.textContent}`;
+    }
+}
+
+
 let currentProject = 0;
 
 function setupListeners() {
@@ -687,22 +718,35 @@ function setupListeners() {
 
     // Set home default project listeners (home, today, and week project tabs)
 
-    const homeProjectButton = document.querySelector('.projectHome');
-    const todayProjectButton = document.querySelector('.projectToday');
-    const weekProjectButton = document.querySelector('.projectWeek');
+    const homeProjectHeader = document.querySelector(`p[data-project-id="0"]`);
+    const todayProjectHeader = document.querySelector(`p[data-project-id="1"]`);
+    const weekProjectHeader = document.querySelector(`p[data-project-id="2"]`);
 
-    homeProjectButton.addEventListener('click', () => {
+    homeProjectHeader.addEventListener('click', function() {
         currentProject = 0;
+        highlightActiveProjectHeader.call(this);
         renderTodosForProject(0);
     });
-    todayProjectButton.addEventListener('click', () => {
+    todayProjectHeader.addEventListener('click', function() {
         currentProject = 1;
+        highlightActiveProjectHeader.call(this);
         renderTodosForProject(1);
     });
-    weekProjectButton.addEventListener('click', () => {
+    weekProjectHeader.addEventListener('click', function() {
         currentProject = 2;
+        highlightActiveProjectHeader.call(this);
         renderTodosForProject(2);
     });
+
+    // Project hover effects
+    homeProjectHeader.addEventListener('mouseenter', hoverProjectIn);
+    homeProjectHeader.addEventListener('mouseleave', hoverProjectOut);
+
+    todayProjectHeader.addEventListener('mouseenter', hoverProjectIn);
+    todayProjectHeader.addEventListener('mouseleave', hoverProjectOut);
+
+    weekProjectHeader.addEventListener('mouseenter', hoverProjectIn);
+    weekProjectHeader.addEventListener('mouseleave', hoverProjectOut);
 
     // Add projects button
     const addProjectButton = document.querySelector('.addProjectButton');
@@ -721,7 +765,6 @@ function setupListeners() {
     deleteProjectButton.addEventListener('click', () => {
         renderDeleteProjectModal();
     });
-
 
     // Notes Button
 }
