@@ -347,7 +347,11 @@ function renderTodosForProject(projectId) {
 
     // Clear any existing todos
     const todoContainer = document.querySelector('.todoContainer');
+    todoContainer.classList.add('show');
     todoContainer.innerHTML = '';
+
+    const notesGrid = document.querySelector('.notesGrid');
+    notesGrid.classList.remove('show');
 
     // Get and render the todos of this project
     let todos = [];
@@ -721,6 +725,7 @@ function setupListeners() {
     const homeProjectHeader = document.querySelector(`p[data-project-id="0"]`);
     const todayProjectHeader = document.querySelector(`p[data-project-id="1"]`);
     const weekProjectHeader = document.querySelector(`p[data-project-id="2"]`);
+    const notesHeader = document.querySelector('p[data-project-id="-1"]');
 
     homeProjectHeader.addEventListener('click', function() {
         currentProject = 0;
@@ -737,6 +742,12 @@ function setupListeners() {
         highlightActiveProjectHeader.call(this);
         renderTodosForProject(2);
     });
+
+    notesHeader.addEventListener('click', function() {
+        currentProject = -1;
+        highlightActiveProjectHeader.call(this);
+        renderNotes();
+    })
 
     // Project hover effects
     homeProjectHeader.addEventListener('mouseenter', hoverProjectIn);
@@ -772,6 +783,21 @@ function setupListeners() {
 // ------------------------
 
 function renderNotes() {
+
+    // Render notes container 
+    const todoContainer = document.querySelector('.todoContainer');
+    todoContainer.classList.remove('show');
+
+    const notesGrid = document.querySelector('.notesGrid');
+    notesGrid.classList.add('show');
+
+    const addTodoButton = document.querySelector('.addTodoButton');
+    const editProjectButton = document.querySelector('.editProjectButton');
+    const deleteProjectButton = document.querySelector('.deleteProjectButton');
+
+    addTodoButton.classList.remove('show');
+    editProjectButton.classList.remove('show');
+    deleteProjectButton.classList.remove('show');
 
 }
 

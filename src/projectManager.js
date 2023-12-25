@@ -80,25 +80,31 @@ function createProjectManager() {
     const listenForCreatedTodos = PubSub.subscribe('addTodoReferenceToProject', function(topicName, idOfTodoToAdd) {
         addTodoToProject(idOfTodoToAdd);
     });
+
     const listenForDeletedTodos = PubSub.subscribe('removeTodoReferenceFromProject', function(topicName, idOfTodoToDelete) {
         deleteTodoFromProject(idOfTodoToDelete);
     });
+
     const listenForCreatedProjects = PubSub.subscribe('createProject', function(topicName, requestType) {
         const project = createAndSaveProject(requestType.title);
         PubSub.publishSync('sendNewProject', project);
     });
+
     const listenForRequestedAllProjects = PubSub.subscribe('requestAllProjects', (topicName) => {
         const allProjects = getAllProjects();
         PubSub.publishSync('sendAllProjects', allProjects);
     });
+
     const listenForRequestedProjects = PubSub.subscribe('requestProject', (topicName, requestType) => {
         const project = getProjectFromStorage(requestType.id);
         PubSub.publishSync('sendProject', project);
     });
+
     const listenForEditedProjects = PubSub.subscribe('editProject', function(topicName, requestType) {
         const project = editProjectTitle(requestType.id, requestType.title);
         PubSub.publishSync('sendEditedProject', project);
     });
+    
     const listenForDeletedProjects = PubSub.subscribe('deleteProjectFromDOM', function(topicName, idOfProjectToDelete) {
         PubSub.publishSync('deleteProject', idOfProjectToDelete);
         deleteProject(idOfProjectToDelete);

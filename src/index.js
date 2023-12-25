@@ -1,5 +1,5 @@
 import './style.css';
-import {endOfMonth, format, startOfDay, startOfToday} from 'date-fns';
+import {format} from 'date-fns';
 import { createTodoManager } from './todoManager';
 import { createProjectManager } from './projectManager';
 import { createNoteManager } from './noteManager';

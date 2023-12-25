@@ -146,22 +146,25 @@ function createTodoManager() {
     const listenForDeletedProjects = PubSub.subscribe('deleteProject', function(topicName, idOfProjectToDelete) {
         deleteAllTodosForThisProject(idOfProjectToDelete);
     });
+    
     const listenForCreatedTodos = PubSub.subscribe('createTodo', function(topicName, todoValues) {
         const newTodo = createAndSaveTodo(todoValues.title, todoValues.details, todoValues.dueDate,
                           todoValues.priority, todoValues.isFinished, 
                           todoValues.parentProjectId);
-
         // Publish todo creation to project manager and publish todo id back
         // to the dom manager (to link the DOM element and todo together)
         PubSub.publishSync('addTodoReferenceToProject', newTodo.getTodo().id);
         PubSub.publishSync('assignTodo', newTodo.getTodo());
     });
+
     const listenForFinishedTodos = PubSub.subscribe('finishTodo', function(topicName, requestType) {
         finishTodo(requestType.id, requestType.finished);
     });
+
     const listenForDeletedTodos = PubSub.subscribe('deleteTodo', function(topicName, todoId) {
         deleteTodo(todoId);
     });
+
     const listenForEditedTodos = PubSub.subscribe('editTodo', function(topicName, todoValues) {
         const editedTodo = editTodo(todoValues.id, todoValues.title, todoValues.details,
                                     todoValues.dueDate, todoValues.priority);
@@ -169,14 +172,17 @@ function createTodoManager() {
             PubSub.publishSync('renderEditedTodo', editedTodo.getTodo());
         }
     });
+
     const listenForRequestedTodo = PubSub.subscribe('requestTodo', function(topicName, todoId) {
         const todo = getTodoFromStorage(todoId);
         PubSub.publishSync('sendTodo', todo);
     });
+
     const listenForRequestedTodosOfAProject = PubSub.subscribe('requestTodosOfProject', function(topicName, projectId) {
         const todosToReturn = getTodosOfThisProject(projectId)
         PubSub.publishSync('sendTodosOfProject', todosToReturn);
     });
+
     const listenForRequestedTodosForToday = PubSub.subscribe('requestTodosOfToday', function(topicName, requestType) {
         let todos = getAllTodosDueToday();
         if (requestType.type == 'unfinished') {
@@ -186,6 +192,7 @@ function createTodoManager() {
         } 
         PubSub.publishSync('sendTodosOfToday', todos);
     });
+
     const listenForRequestedTodosForThisWeek = PubSub.subscribe('requestTodosOfThisWeek', function(topicName, requestType) {
         let todos = getAllTodosDueThisWeek();
         if (requestType.type == 'unfinished') {
