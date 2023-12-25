@@ -2,31 +2,21 @@ import { createNote } from "./note";
 
 function createNoteManager() {
 
-    const createAndSaveNote = (id, title, details) => {
-        // Don't allow duplicate id's
-        if (localStorage.getItem(`note-${id}`)) {
-            console.log("A Note with that id already exists!");
-            return
+    const createAndSaveNote = (title, details) => {
+
+        let id = localStorage.getItem('noteIdCount');
+        if (!id) {
+            localStorage.setItem('noteIdCount', 0);
+            id = 0;
+        } else {
+            id++;
+            // Double check to not allow duplicate id's
+            if (localStorage.getItem(`note-${id}`)) {
+                console.log("A note with that id already exists!");
+                return
+            }
+            localStorage.setItem('noteIdCount', id);
         }
-        // NEED TO REFACTOR TO THIS \/ \/ \/ \/ \/ \/
-
-        // // Give the todo an id (this id does not decrease if a todo is 
-        // // deleted, to prevent duplicate ids)
-        // let id = localStorage.getItem('todoIdCount');
-        // if (!id) {
-        //     localStorage.setItem('todoIdCount', 0);
-        //     id = 0;
-        // } else {
-        //     id++;
-        //     // Double check to not allow duplicate id's
-        //     if (localStorage.getItem(`todo-${id}`)) {
-        //         console.log("A todo with that id already exists!");
-        //         return
-        //     }
-        //     localStorage.setItem('todoIdCount', id);
-        // }
-
-
         const newNote = createNote(id, title, details);
         localStorage.setItem(`note-${id}`, JSON.stringify(newNote.getNote()));
         return newNote;
@@ -55,8 +45,6 @@ function createNoteManager() {
     const deleteNote = (idOfNoteToDelete) => {
         localStorage.removeItem(`note-${idOfNoteToDelete}`);
     }
-
-    return { createAndSaveNote, editNoteTitle, editNoteDetails, deleteNote}
 }
 
 export { createNoteManager }
