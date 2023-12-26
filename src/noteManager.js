@@ -45,6 +45,17 @@ function createNoteManager() {
     const deleteNote = (idOfNoteToDelete) => {
         localStorage.removeItem(`note-${idOfNoteToDelete}`);
     }
+
+    // listen for created notes
+    const listenForCreatedNotes = PubSub.subscribe('createNote', function(topicName) {
+        const newNote = createAndSaveNote('', '');
+        PubSub.publishSync('assignNote', newNote.getNote());
+    });
+
+    // listen for edited notes
+
+    // listen for deleted notes
+
 }
 
 export { createNoteManager }

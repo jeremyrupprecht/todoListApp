@@ -59,6 +59,13 @@ function renderAllImages() {
     const plusIconElement2 = new Image();
     plusIconElement2.src = plusIcon;
     addProjectButton.appendChild(plusIconElement2);
+
+    // Add note button
+
+    const addNoteButton = document.querySelector('.addNoteButton');
+    const plusIconElement3 = new Image();
+    plusIconElement3.src = plusIcon;
+    addNoteButton.appendChild(plusIconElement3);
 }
 
 function renderTodoModal(createOrEdit, idOfTodoToEdit) {
@@ -352,6 +359,9 @@ function renderTodosForProject(projectId) {
 
     const notesGrid = document.querySelector('.notesGrid');
     notesGrid.classList.remove('show');
+
+    const addNotebutton = document.querySelector('.addNoteButton');
+    addNotebutton.classList.remove('show');
 
     // Get and render the todos of this project
     let todos = [];
@@ -777,7 +787,10 @@ function setupListeners() {
         renderDeleteProjectModal();
     });
 
-    // Notes Button
+    // Add notes button
+    const addNoteButton = document.querySelector('.addNoteButton');
+    addNoteButton.addEventListener('click', addAndRenderNote);
+
 }
 
 // ------------------------
@@ -799,9 +812,29 @@ function renderNotes() {
     editProjectButton.classList.remove('show');
     deleteProjectButton.classList.remove('show');
 
+    const addNotebutton = document.querySelector('.addNoteButton');
+    addNotebutton.classList.add('show');
+
 }
 
-function renderNote() {
+function addAndRenderNote() {
+ 
+    // Add note to database
+    let noteId = null;
+    const getNoteValuesSubscription = PubSub.subscribe('assignNote', function(msg, noteToRender) {
+        noteId = noteToRender.id;
+    });
+    PubSub.publishSync('createNote');
+    PubSub.unsubscribe(getNoteValuesSubscription);
+
+
+
+    // Note image
+
+    // Delete note image,
+
+    // Delete note listener --> Delete note from database and remove it from
+    // DOM
 
 }
 

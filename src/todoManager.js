@@ -20,12 +20,12 @@ function createTodoManager() {
         return allTodos;
     }
 
-    const getAllTodosDueBeforeThisDate = (date) => {
-        const allTodos = getAllTodos();
-        const todosBeforeThisDate = allTodos.filter((todo) => 
-        parseISO(todo.dueDate).getTime() <= parseISO(date).getTime());
-        return todosBeforeThisDate;
-    }
+    // const getAllTodosDueBeforeThisDate = (date) => {
+    //     const allTodos = getAllTodos();
+    //     const todosBeforeThisDate = allTodos.filter((todo) => 
+    //     parseISO(todo.dueDate).getTime() <= parseISO(date).getTime());
+    //     return todosBeforeThisDate;
+    // }
 
     const getAllTodosDueToday = () => {
         const allTodos = getAllTodos();
