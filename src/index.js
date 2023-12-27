@@ -5,12 +5,12 @@ import { createProjectManager } from './projectManager';
 import { createNoteManager } from './noteManager';
 import { renderScreen, setupListeners} from './domManager';
 
-function preloadData() {
+function preloadTodoData() {
 
     // Need to load template todos if there are none (like when the user first
     // opens the site)
     if (!localStorage.getItem('todoIdCount')) {
-        console.log("Empty local storage detected, preloading data...");
+        console.log("Empty local storage detected, preloading todo data...");
 
         const date0 = format(new Date(2023, 11, 21), 'yyyy-MM-dd');
         const date1 = format(new Date(2023, 11, 20), 'yyyy-MM-dd');
@@ -61,6 +61,39 @@ function preloadData() {
     }
 }
 
+function preloadNoteData() {
+
+    if (!localStorage.getItem('noteIdCount')) {
+        console.log("Empty local storage detected, preloading note data...");
+
+        const values0 = {title: 'Title0', details: 'Details0'};
+        PubSub.publishSync('createNote', values0);
+        
+        const values1 = {title: 'Title1', details: 'Details1'};
+        PubSub.publishSync('createNote', values1);
+        
+        const values2 = {title: 'Title2', details: 'Details2'};
+        PubSub.publishSync('createNote', values2);
+
+        const values3 = {title: 'Title3', details: 'Details3'};
+        PubSub.publishSync('createNote', values3);
+
+        const values4 = {title: 'Title4', details: 'Details4'};
+        PubSub.publishSync('createNote', values4);
+
+        const values5 = {title: 'Title5', details: 'Details5'};
+        PubSub.publishSync('createNote', values5);
+
+        const values6 = {title: 'Title6', details: 'Details6'};
+        PubSub.publishSync('createNote', values6);
+
+        const values7 = {title: 'Title7', details: 'Details7'};
+        PubSub.publishSync('createNote', values7);
+        
+    }
+
+}
+
 function createDefaultProjects() {
     if (!localStorage.getItem('projectIdCount')) {
         PubSub.publishSync('createProject', {title: 'Home'});        
@@ -74,6 +107,7 @@ createProjectManager();
 createNoteManager();
 
 createDefaultProjects();
-preloadData();
+preloadTodoData();
+preloadNoteData();
 renderScreen();
 setupListeners();

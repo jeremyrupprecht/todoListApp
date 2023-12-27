@@ -816,6 +816,17 @@ function renderNotes() {
     addNotebutton.classList.add('show');
 
     // Render existing notes
+    let notes = [];
+    const subscription = PubSub.subscribe('sendAllNotes', function(msg, receivedNotes) {
+        notes = receivedNotes;
+    });
+    PubSub.publishSync('requestAllNotes');
+    PubSub.unsubscribe(subscription);
+
+    for (let i = 0; i < notes.length; i++) {
+        renderNote(notes[i].id);
+    }
+
 
 
 }
@@ -827,75 +838,85 @@ function addAndRenderNote() {
     const getNoteValuesSubscription = PubSub.subscribe('assignNote', function(msg, noteToRender) {
         noteId = noteToRender.id;
     });
-    PubSub.publishSync('createNote');
+    PubSub.publishSync('createNote', {title: '', details: ''});
     PubSub.unsubscribe(getNoteValuesSubscription);
 
     if (noteId != -1) {
+        renderNote(noteId);
+    }
+}
 
-        const noteItem = document.createElement('div');
-        const noteTitle = document.createElement('div');
-        const noteDetails = document.createElement('div');
+function renderNote(id) {
 
-        noteItem.classList.add('noteItem');
-        noteItem.setAttribute('data-note-id', `${noteId}`);
-        // noteItem.setAttribute('contenteditable', 'true');
+    const noteItem = document.createElement('div');
+    const noteTitle = document.createElement('div');
+    const noteDetails = document.createElement('div');
+    const noteFlexbox = document.createElement('div');
 
-        noteTitle.classList.add('noteTitle');
-        noteTitle.setAttribute('spellcheck', 'false');
-        noteTitle.setAttribute('contenteditable', 'true');
-        noteTitle.setAttribute('data-text', 'Title...');
-        noteTitle.setAttribute('draggable', 'false');
+    noteItem.classList.add('noteItem');
+    noteItem.setAttribute('data-note-id', `${id}`);
 
-        noteDetails.classList.add('noteDetails');
-        noteDetails.setAttribute('spellcheck', 'false');
-        noteDetails.setAttribute('contenteditable', 'true');
-        noteDetails.setAttribute('data-text', 'Details...');
-        noteDetails.setAttribute('draggable', 'false');
+    noteFlexbox.classList.add('noteFlexWidth');
 
-        noteItem.appendChild(noteTitle);
-        noteItem.appendChild(noteDetails);
+    // Note deletion Image
+    const deleteNoteButton = document.createElement('button');
+    deleteNoteButton.classList.add('deleteNoteButton');
+    const closeIconElement = new Image();
+    closeIconElement.src = closeIcon;
+    deleteNoteButton.appendChild(closeIconElement);
 
-        const shortestColumn = getShortestNoteColumn(3);
-        if (shortestColumn) {
-            shortestColumn.appendChild(noteItem);
-        }
+    noteTitle.classList.add('noteTitle');
+    noteTitle.setAttribute('spellcheck', 'false');
+    noteTitle.setAttribute('contenteditable', 'true');
+    noteTitle.setAttribute('data-text', 'Title...');
+    noteTitle.setAttribute('draggable', 'false');
 
-        noteTitle.addEventListener('keydown', function() {
-            const title = noteTitle.innerHTML;
-            const details = noteDetails.innerHTML;
-            PubSub.publishSync('editNote', {id: noteId, title, details});
-        });
+    noteDetails.classList.add('noteDetails');
+    noteDetails.setAttribute('spellcheck', 'false');
+    noteDetails.setAttribute('contenteditable', 'true');
+    noteDetails.setAttribute('data-text', 'Details...');
+    noteDetails.setAttribute('draggable', 'false');
 
-        noteDetails.addEventListener('keydown', function() {
-            const title = noteTitle.innerHTML;
-            const details = noteDetails.innerHTML;
-            PubSub.publishSync('editNote', {id: noteId, title, details});
-        });
+    // Set note existing text......
 
-        noteTitle.addEventListener('mousedown', function() {
-            this.focus();
-        })
+    noteFlexbox.appendChild(noteTitle);
+    noteFlexbox.appendChild(deleteNoteButton);
+    noteItem.appendChild(noteFlexbox);
+    noteItem.appendChild(noteDetails);
 
-        noteDetails.addEventListener('mousedown', function() {
-            this.focus();
-        })
-
-        // Note deletion
+    const shortestColumn = getShortestNoteColumn(3);
+    if (shortestColumn) {
+        shortestColumn.appendChild(noteItem);
     }
 
+    noteTitle.addEventListener('keydown', function() {
+        const title = noteTitle.innerHTML;
+        const details = noteDetails.innerHTML;
+        PubSub.publishSync('editNote', {id: id, title, details});
+    });
 
+    noteDetails.addEventListener('keydown', function() {
+        const title = noteTitle.innerHTML;
+        const details = noteDetails.innerHTML;
+        PubSub.publishSync('editNote', {id: id, title, details});
+    });
 
-    // Note image
+    noteTitle.addEventListener('mousedown', function() {
+        this.focus();
+    });
 
-    // Delete note image,
+    noteDetails.addEventListener('mousedown', function() {
+        this.focus();
+    });  
 
-    // Delete note listener --> Delete note from database and remove it from
-    // DOM
-
+    deleteNoteButton.addEventListener('click', function() {
+        // Remove note from database and note element from DOM
+        PubSub.publishSync('deleteNote', id);
+        noteItem.remove();
+    });
 }
 
 function getShortestNoteColumn(numberOfColumns) {
-
     let shortestLength = 1000;
     let shortestColumn = 1000;
     for (let i = 0; i < numberOfColumns; i++) {
@@ -909,6 +930,5 @@ function getShortestNoteColumn(numberOfColumns) {
         return shortestColumn;
     }
 }
-
 
 export {renderScreen, setupListeners}

@@ -13,7 +13,7 @@ function createTodoManager() {
         const allTodos = []
         const keys = Object.keys(localStorage);
         for (let i = 0; i < keys.length; i++) {
-            if (keys[i].includes("todo")) {
+            if (keys[i].includes("todo-")) {
                 allTodos.push(JSON.parse(localStorage.getItem(keys[i])));
             }
         }
