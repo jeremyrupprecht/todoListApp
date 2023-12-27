@@ -632,6 +632,10 @@ input[type="radio"] {
     margin-bottom: 10px;
 }
 
+.noteDetails {
+    padding-bottom: 5px;
+}
+
 .noteTitle:empty:not(:focus):before, 
 .noteDetails:empty:not(:focus):before {
     content: attr(data-text);
@@ -640,6 +644,10 @@ input[type="radio"] {
 
 .addNoteButton {
     display: none;
+}
+
+[contenteditable] {
+    outline: 0px solid transparent;
 }
 
 @media only screen and (max-width: 1280px) {

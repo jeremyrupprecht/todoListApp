@@ -731,7 +731,6 @@ function setupListeners() {
     addTodoButton.addEventListener('click', () => renderTodoModal('create', ""));
 
     // Set home default project listeners (home, today, and week project tabs)
-
     const homeProjectHeader = document.querySelector(`p[data-project-id="0"]`);
     const todayProjectHeader = document.querySelector(`p[data-project-id="1"]`);
     const weekProjectHeader = document.querySelector(`p[data-project-id="2"]`);
@@ -785,6 +784,7 @@ function setupListeners() {
 
     deleteProjectButton.addEventListener('click', () => {
         renderDeleteProjectModal();
+        // FIX THIS
     });
 
     // Add notes button
@@ -815,17 +815,73 @@ function renderNotes() {
     const addNotebutton = document.querySelector('.addNoteButton');
     addNotebutton.classList.add('show');
 
+    // Render existing notes
+
+
 }
 
 function addAndRenderNote() {
  
     // Add note to database
-    let noteId = null;
+    let noteId = -1;
     const getNoteValuesSubscription = PubSub.subscribe('assignNote', function(msg, noteToRender) {
         noteId = noteToRender.id;
     });
     PubSub.publishSync('createNote');
     PubSub.unsubscribe(getNoteValuesSubscription);
+
+    if (noteId != -1) {
+
+        const noteItem = document.createElement('div');
+        const noteTitle = document.createElement('div');
+        const noteDetails = document.createElement('div');
+
+        noteItem.classList.add('noteItem');
+        noteItem.setAttribute('data-note-id', `${noteId}`);
+        // noteItem.setAttribute('contenteditable', 'true');
+
+        noteTitle.classList.add('noteTitle');
+        noteTitle.setAttribute('spellcheck', 'false');
+        noteTitle.setAttribute('contenteditable', 'true');
+        noteTitle.setAttribute('data-text', 'Title...');
+        noteTitle.setAttribute('draggable', 'false');
+
+        noteDetails.classList.add('noteDetails');
+        noteDetails.setAttribute('spellcheck', 'false');
+        noteDetails.setAttribute('contenteditable', 'true');
+        noteDetails.setAttribute('data-text', 'Details...');
+        noteDetails.setAttribute('draggable', 'false');
+
+        noteItem.appendChild(noteTitle);
+        noteItem.appendChild(noteDetails);
+
+        const shortestColumn = getShortestNoteColumn(3);
+        if (shortestColumn) {
+            shortestColumn.appendChild(noteItem);
+        }
+
+        noteTitle.addEventListener('keydown', function() {
+            const title = noteTitle.innerHTML;
+            const details = noteDetails.innerHTML;
+            PubSub.publishSync('editNote', {id: noteId, title, details});
+        });
+
+        noteDetails.addEventListener('keydown', function() {
+            const title = noteTitle.innerHTML;
+            const details = noteDetails.innerHTML;
+            PubSub.publishSync('editNote', {id: noteId, title, details});
+        });
+
+        noteTitle.addEventListener('mousedown', function() {
+            this.focus();
+        })
+
+        noteDetails.addEventListener('mousedown', function() {
+            this.focus();
+        })
+
+        // Note deletion
+    }
 
 
 
@@ -836,6 +892,22 @@ function addAndRenderNote() {
     // Delete note listener --> Delete note from database and remove it from
     // DOM
 
+}
+
+function getShortestNoteColumn(numberOfColumns) {
+
+    let shortestLength = 1000;
+    let shortestColumn = 1000;
+    for (let i = 0; i < numberOfColumns; i++) {
+        const column = document.querySelector(`.noteColumn[data-note-column-id="${i}"]`);
+        if (column && column.children.length < shortestLength) {
+            shortestLength = column.children.length;
+            shortestColumn = column;
+        }
+    }
+    if (shortestLength < 1000) {
+        return shortestColumn;
+    }
 }
 
 

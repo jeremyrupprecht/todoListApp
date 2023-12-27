@@ -22,21 +22,31 @@ function createNoteManager() {
         return newNote;
     }
 
-    const editNoteTitle = (idOfNoteToEdit, title) => {
-        const noteValues = JSON.parse(localStorage.getItem(`note-${idOfNoteToEdit}`));
-        if (noteValues) {
-            const editedNote = createNote(noteValues.id, title, noteValues.details);
-            localStorage.setItem(`note-${idOfNoteToEdit}`, JSON.stringify(editedNote.getNote())); 
-            return 
-        }
-        console.log("This note does not exist!");
-    }
+    // const editNoteTitle = (idOfNoteToEdit, title) => {
+    //     const noteValues = JSON.parse(localStorage.getItem(`note-${idOfNoteToEdit}`));
+    //     if (noteValues) {
+    //         const editedNote = createNote(noteValues.id, title, noteValues.details);
+    //         localStorage.setItem(`note-${idOfNoteToEdit}`, JSON.stringify(editedNote.getNote())); 
+    //         return 
+    //     }
+    //     console.log("This note does not exist!");
+    // }
 
-    const editNoteDetails = (idOfNoteToEdit, details) => {
-        const noteValues = JSON.parse(localStorage.getItem(`note-${idOfNoteToEdit}`));
+    // const editNoteDetails = (idOfNoteToEdit, details) => {
+    //     const noteValues = JSON.parse(localStorage.getItem(`note-${idOfNoteToEdit}`));
+    //     if (noteValues) {
+    //         const editedNote = createNote(noteValues.id, noteValues.title, details);
+    //         localStorage.setItem(`note-${idOfNoteToEdit}`, JSON.stringify(editedNote.getNote())); 
+    //         return 
+    //     }
+    //     console.log("This note does not exist!");
+    // }
+
+    const editNote = (id, title, details) => {
+        const noteValues = JSON.parse(localStorage.getItem(`note-${id}`));
         if (noteValues) {
-            const editedNote = createNote(noteValues.id, noteValues.title, details);
-            localStorage.setItem(`note-${idOfNoteToEdit}`, JSON.stringify(editedNote.getNote())); 
+            const editedNote = createNote(id, title, details);
+            localStorage.setItem(`note-${id}`, JSON.stringify(editedNote.getNote())); 
             return 
         }
         console.log("This note does not exist!");
@@ -46,13 +56,13 @@ function createNoteManager() {
         localStorage.removeItem(`note-${idOfNoteToDelete}`);
     }
 
-    // listen for created notes
     const listenForCreatedNotes = PubSub.subscribe('createNote', function(topicName) {
         const newNote = createAndSaveNote('', '');
         PubSub.publishSync('assignNote', newNote.getNote());
     });
-
-    // listen for edited notes
+    const listenForEditedNotes = PubSub.subscribe('editNote', function(topicName, requestType) {
+        editNote(requestType.id, requestType.title, requestType.details);
+    });
 
     // listen for deleted notes
 
