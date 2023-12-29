@@ -7,6 +7,7 @@ import plusIcon from './images/plusIcon.svg';
 import closeIcon from './images/closeIcon.svg';
 import {parse, format} from 'date-fns';
 import { PubSub } from 'pubsub-js';
+import { title } from 'process';
 
 function renderAllImages() {
 
@@ -627,13 +628,6 @@ function populateProjectFormWithExistingTitle() {
     PubSub.unsubscribe(subscription);
 }
 
-function renderScreen() {
-    renderAllImages();
-    renderTodosForProject(0);
-    renderExistingProjects();
-    renderTodoCounts();
-}
-
 function renderDeleteProjectModal() {
     
     // Show modal
@@ -723,78 +717,6 @@ function highlightActiveProjectHeader() {
     }
 }
 
-
-let currentProject = 0;
-
-function setupListeners() {
-    const addTodoButton = document.querySelector('.addTodoButton');
-    addTodoButton.addEventListener('click', () => renderTodoModal('create', ""));
-
-    // Set home default project listeners (home, today, and week project tabs)
-    const homeProjectHeader = document.querySelector(`p[data-project-id="0"]`);
-    const todayProjectHeader = document.querySelector(`p[data-project-id="1"]`);
-    const weekProjectHeader = document.querySelector(`p[data-project-id="2"]`);
-    const notesHeader = document.querySelector('p[data-project-id="-1"]');
-
-    homeProjectHeader.addEventListener('click', function() {
-        currentProject = 0;
-        highlightActiveProjectHeader.call(this);
-        renderTodosForProject(0);
-    });
-    todayProjectHeader.addEventListener('click', function() {
-        currentProject = 1;
-        highlightActiveProjectHeader.call(this);
-        renderTodosForProject(1);
-    });
-    weekProjectHeader.addEventListener('click', function() {
-        currentProject = 2;
-        highlightActiveProjectHeader.call(this);
-        renderTodosForProject(2);
-    });
-
-    notesHeader.addEventListener('click', function() {
-        currentProject = -1;
-        highlightActiveProjectHeader.call(this);
-        renderNotes();
-    })
-
-    // Project hover effects
-    homeProjectHeader.addEventListener('mouseenter', hoverProjectIn);
-    homeProjectHeader.addEventListener('mouseleave', hoverProjectOut);
-
-    todayProjectHeader.addEventListener('mouseenter', hoverProjectIn);
-    todayProjectHeader.addEventListener('mouseleave', hoverProjectOut);
-
-    weekProjectHeader.addEventListener('mouseenter', hoverProjectIn);
-    weekProjectHeader.addEventListener('mouseleave', hoverProjectOut);
-
-    // Add projects button
-    const addProjectButton = document.querySelector('.addProjectButton');
-    addProjectButton.addEventListener('click', () => {
-        renderProjectModal('create');
-    });
-
-    // Edit and delete project buttons
-
-    const editProjectButton = document.querySelector('.editProjectButton');
-    const deleteProjectButton = document.querySelector('.deleteProjectButton');
-    editProjectButton.addEventListener('click', () => {
-        renderProjectModal('edit');
-    });
-
-    deleteProjectButton.addEventListener('click', () => {
-        renderDeleteProjectModal();
-        // FIX THIS
-    });
-
-    // Add notes button
-    const addNoteButton = document.querySelector('.addNoteButton');
-    addNoteButton.addEventListener('click', addAndRenderNote);
-
-}
-
-// ------------------------
-
 function renderNotes() {
 
     // Render notes container 
@@ -803,7 +725,7 @@ function renderNotes() {
 
     const notesGrid = document.querySelector('.notesGrid');
     notesGrid.classList.add('show');
-
+    
     const addTodoButton = document.querySelector('.addTodoButton');
     const editProjectButton = document.querySelector('.editProjectButton');
     const deleteProjectButton = document.querySelector('.deleteProjectButton');
@@ -815,6 +737,12 @@ function renderNotes() {
     const addNotebutton = document.querySelector('.addNoteButton');
     addNotebutton.classList.add('show');
 
+    // Clear any previously rendered notes
+    for (let i = 0; i < currentNumberOfNoteColumns; i++) {
+        const column = document.querySelector(`.noteColumn[data-note-column-id="${i}"]`);
+        column.innerHTML = '';
+    }
+
     // Render existing notes
     let notes = [];
     const subscription = PubSub.subscribe('sendAllNotes', function(msg, receivedNotes) {
@@ -822,17 +750,14 @@ function renderNotes() {
     });
     PubSub.publishSync('requestAllNotes');
     PubSub.unsubscribe(subscription);
-
+    // Sort the list so the notes appear in order
+    notes.sort((n1, n2) => n1.id - n2.id);
     for (let i = 0; i < notes.length; i++) {
         renderNote(notes[i].id);
     }
-
-
-
 }
 
 function addAndRenderNote() {
- 
     // Add note to database
     let noteId = -1;
     const getNoteValuesSubscription = PubSub.subscribe('assignNote', function(msg, noteToRender) {
@@ -840,7 +765,6 @@ function addAndRenderNote() {
     });
     PubSub.publishSync('createNote', {title: '', details: ''});
     PubSub.unsubscribe(getNoteValuesSubscription);
-
     if (noteId != -1) {
         renderNote(noteId);
     }
@@ -877,7 +801,17 @@ function renderNote(id) {
     noteDetails.setAttribute('data-text', 'Details...');
     noteDetails.setAttribute('draggable', 'false');
 
-    // Set note existing text......
+    // Set note existing text
+    let titleToRender = '';
+    let detailsToRender = '';
+    const getNoteValuesSubscription = PubSub.subscribe('sendNote', function(msg, noteToRender) {
+        titleToRender = noteToRender.title;
+        detailsToRender = noteToRender.details;
+    });
+    PubSub.publishSync('requestNote', id);
+    PubSub.unsubscribe(getNoteValuesSubscription);
+    noteTitle.innerHTML = titleToRender;
+    noteDetails.innerHTML = detailsToRender;
 
     noteFlexbox.appendChild(noteTitle);
     noteFlexbox.appendChild(deleteNoteButton);
@@ -929,6 +863,113 @@ function getShortestNoteColumn(numberOfColumns) {
     if (shortestLength < 1000) {
         return shortestColumn;
     }
+}
+
+function renderNoteColumnsBasedOnScreenSize() {
+    if (currentProject != -1) return;
+
+    const notesContainer = document.querySelector('.notesGrid');
+    const middleColumn = document.querySelector(`.noteColumn[data-column-identifier="middle"]`);
+    const rightColumn = document.querySelector(`.noteColumn[data-column-identifier="right"]`);
+
+    const windowWidth = window.innerWidth;
+    if (windowWidth < 800) {
+        currentNumberOfNoteColumns = 2;
+        middleColumn.classList.remove('show');
+        notesContainer.classList.add('twoColumns');
+        middleColumn.setAttribute('data-note-column-id', -1);
+        rightColumn.setAttribute('data-note-column-id', 1);
+    } else {
+        currentNumberOfNoteColumns = 3;
+        middleColumn.classList.add('show');
+        notesContainer.classList.remove('twoColumns');
+        middleColumn.setAttribute('data-note-column-id', 1);
+        rightColumn.setAttribute('data-note-column-id', 2);
+    }
+}
+
+// For thinner screen sizes, use 2 note columns instead of 3
+window.addEventListener('resize', () => {
+    renderNoteColumnsBasedOnScreenSize();
+    renderNotes();
+}, true);
+
+let currentProject = 0;
+let currentNumberOfNoteColumns = 3;
+
+function renderScreen() {
+    renderAllImages();
+    renderTodosForProject(0);
+    renderExistingProjects();
+    renderTodoCounts();
+}
+
+function setupListeners() {
+    const addTodoButton = document.querySelector('.addTodoButton');
+    addTodoButton.addEventListener('click', () => renderTodoModal('create', ""));
+
+    // Set home default project listeners (home, today, and week project tabs)
+    const homeProjectHeader = document.querySelector(`p[data-project-id="0"]`);
+    const todayProjectHeader = document.querySelector(`p[data-project-id="1"]`);
+    const weekProjectHeader = document.querySelector(`p[data-project-id="2"]`);
+    const notesHeader = document.querySelector('p[data-project-id="-1"]');
+
+    homeProjectHeader.addEventListener('click', function() {
+        currentProject = 0;
+        highlightActiveProjectHeader.call(this);
+        renderTodosForProject(0);
+    });
+    todayProjectHeader.addEventListener('click', function() {
+        currentProject = 1;
+        highlightActiveProjectHeader.call(this);
+        renderTodosForProject(1);
+    });
+    weekProjectHeader.addEventListener('click', function() {
+        currentProject = 2;
+        highlightActiveProjectHeader.call(this);
+        renderTodosForProject(2);
+    });
+
+    notesHeader.addEventListener('click', function() {
+        currentProject = -1;
+        highlightActiveProjectHeader.call(this);
+        renderNoteColumnsBasedOnScreenSize();
+        renderNotes();
+    })
+
+    // Project hover effects
+    homeProjectHeader.addEventListener('mouseenter', hoverProjectIn);
+    homeProjectHeader.addEventListener('mouseleave', hoverProjectOut);
+
+    todayProjectHeader.addEventListener('mouseenter', hoverProjectIn);
+    todayProjectHeader.addEventListener('mouseleave', hoverProjectOut);
+
+    weekProjectHeader.addEventListener('mouseenter', hoverProjectIn);
+    weekProjectHeader.addEventListener('mouseleave', hoverProjectOut);
+
+    // Add projects button
+    const addProjectButton = document.querySelector('.addProjectButton');
+    addProjectButton.addEventListener('click', () => {
+        renderProjectModal('create');
+    });
+
+    // Edit and delete project buttons
+
+    const editProjectButton = document.querySelector('.editProjectButton');
+    const deleteProjectButton = document.querySelector('.deleteProjectButton');
+    editProjectButton.addEventListener('click', () => {
+        renderProjectModal('edit');
+    });
+
+    deleteProjectButton.addEventListener('click', () => {
+        renderDeleteProjectModal();
+        // FIX THIS
+    });
+
+    // Add notes button
+    const addNoteButton = document.querySelector('.addNoteButton');
+    addNoteButton.addEventListener('click', addAndRenderNote);
+
 }
 
 export {renderScreen, setupListeners}

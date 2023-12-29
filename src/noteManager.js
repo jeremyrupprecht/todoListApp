@@ -2,6 +2,11 @@ import { createNote } from "./note";
 
 function createNoteManager() {
 
+    const getNoteFromStorage = (id) => {
+        const note = JSON.parse(localStorage.getItem(`note-${id}`));        
+        return note
+    }
+
     const getAllNotes = () => {
         const allNotes = [];
         const keys = Object.keys(localStorage);
@@ -61,7 +66,11 @@ function createNoteManager() {
     const listenForDeletedNotes = PubSub.subscribe('deleteNote', function(topicName, id) {
         deleteNote(id);
     });
-    const listenForRequestedNotes = PubSub.subscribe('requestAllNotes', function(topicName) {
+    const listenForRequestedNotes = PubSub.subscribe('requestNote', function(topicName, id) {
+        const note = getNoteFromStorage(id);
+        PubSub.publishSync('sendNote', note);
+    });
+    const listenForRequestedAllNotes = PubSub.subscribe('requestAllNotes', function(topicName) {
         const allNotes = getAllNotes();
         PubSub.publishSync('sendAllNotes', allNotes);
     });

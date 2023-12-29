@@ -316,7 +316,7 @@ input[type="checkbox"] {
 }
 
 .createTodoModal.show, .modalFullScreenOverlay.show, .detailsModal.show,
-.addProjectModal.show, .areYouSureModal.show, .todoContainer.show {
+.addProjectModal.show, .areYouSureModal.show, .todoContainer.show, .noteColumn.show {
     display: flex;
 }
 
@@ -605,12 +605,16 @@ input[type="radio"] {
     flex: 1;
 }
 
+.notesGrid.twoColumns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .notesGrid.show {
     display: grid;
 }
 
 .noteColumn {
-    display: flex;
+    display: none;
     flex-direction: column;
 }
 
