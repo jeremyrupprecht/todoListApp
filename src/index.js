@@ -7,7 +7,7 @@ import { renderScreen, setupListeners} from './domManager';
 
 function preloadTodoData() {
     // Need to load template todos if there are none (like when the user first
-    // opens the site)
+    // opens the site) 
     if (!localStorage.getItem('todoIdCount')) {
         console.log("Empty local storage detected, preloading todo data...");
 
