@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDEX</title>
+    <title>Todo List App</title>
 </head>
 <body>
     <div id="content">
@@ -32,29 +32,11 @@
                 </div>
                 <div class="projectHeader projects">
                     <p>Projects</p>
-
                     <div class="projectsSideBarFlexbox">
-                        <div class="newProjects">
-
-                            <!-- <div class="newProjectContainer">
-                                <p>Project1</p>
-                                <div class="todoCountContainer">
-                                    <p class="todoCount">5</p>
-                                </div>
-                            </div>
-
-                            <div class="newProjectContainer">
-                                <p>Project333333333333333333333333333333</p>
-                                <div class="todoCountContainer">
-                                    <p class="todoCount">3</p>
-                                </div>
-                            </div>                             -->
-
-                        </div>
+                        <div class="newProjects"></div>
                         <button class="addProjectButton"></button>
                     </div>
                 </div>
-
                 <div class="projectHeader Notes">
                     <p data-project-id="-1">Notes</p>
                 </div>
@@ -62,80 +44,12 @@
             </div>
             <div class="mainSection">
 
-                <div class="todoContainer">
-                    <!-- <div class="todoItem">
-                        <div class="todoLeft">
-                            <div class="todoPriority"></div>
-                            <input type="checkbox" id="todoFinished" name="todoFinished">
-                            <div class="todoTitle titleFinished">Get Dressed</div>
-                        </div>
-    
-                        <div class="todoRight">
-                            <div class="todoDetails detailsFinished">DETAILS</div>
-                            <div class="todoDueDate dueDateFinished">June 8th</div>
-                            <button class="editTodoButton todoButton"></button>
-                            <button class="deleteTodoButton todoButton"></button>
-                        </div>
-                    </div> -->
-                </div>
+                <div class="todoContainer"></div>
 
                 <div class="notesGrid">
-
-                    <div class="noteColumn" data-note-column-id="0" >
-                        <!-- <div class="noteItem" data-note-id="0" contenteditable="true">
-                            <div class="noteTitle" contenteditable="true" spellcheck="false" data-text="Title..."></div>
-                            <div class="noteDetails" contenteditable="true" spellcheck="false" data-text="Details..."></div>
-                         </div>
-     
-                         <div class="noteItem" data-note-id="1">
-                             <div class="noteTitle" contenteditable="true" spellcheck="false">titleee2</div>
-                             <div class="noteDetails" contenteditable="true" spellcheck="false">detalisss</div>
-                          </div>
-
-                          <div class="noteItem" data-note-id="1">
-                            <div class="noteTitle" contenteditable="true" spellcheck="false">titleee2</div>
-                            <div class="noteDetails" contenteditable="true" spellcheck="false">detalisss</div>
-                         </div> -->
-                    </div>
-
-                    <div class="noteColumn" data-note-column-id="1">
-                        <!-- <div class="noteItem" data-note-id="2" contenteditable="true">
-                            <div class="noteTitle" contenteditable="true" spellcheck="false">titleee3</div>
-                            <div class="noteDetails" contenteditable="true" spellcheck="false">detalisss</div>
-                         </div>
-    
-                         <div class="noteItem" data-note-id="3" contenteditable="true">
-                            <div class="noteTitle" contenteditable="true" spellcheck="false">titleee4</div>
-                            <div class="noteDetails" contenteditable="true" spellcheck="false">detalisss</div>
-                         </div> -->
-                    </div>
-
-                    <div class="noteColumn" data-note-column-id="2">
-                        <!-- <div class="noteItem" data-note-id="4" contenteditable="true">
-                            <div class="noteTitle" contenteditable="true" spellcheck="false">titleee5</div>
-                            <div class="noteDetails" contenteditable="true" spellcheck="false">detalisss</div>
-                         </div>
-    
-                         <div class="noteItem" data-note-id="5" contenteditable="true">
-                            <div class="noteTitle" contenteditable="true" spellcheck="false">titleee6</div>
-                            <div class="noteDetails" contenteditable="true" spellcheck="false">detalisss</div>
-                         </div>
-    
-                         <div class="noteItem" data-note-id="6" contenteditable="true">
-                            <div class="noteTitle" contenteditable="true" spellcheck="false">titleee7</div>
-                            <div class="noteDetails" contenteditable="true" spellcheck="false">detalisss</div>
-                         </div>
-
-                         <div class="noteItem" data-note-id="6" contenteditable="true">
-                            <div class="noteTitle" contenteditable="true" spellcheck="false">titleee7</div>
-                            <div class="noteDetails" contenteditable="true" spellcheck="false">detalisss</div>
-                         </div>
-
-                         <div class="noteItem" data-note-id="6" contenteditable="true">
-                            <div class="noteTitle" contenteditable="true" spellcheck="false">titleee7</div>
-                            <div class="noteDetails" contenteditable="true" spellcheck="false">detalisss</div>
-                         </div> -->
-                    </div>
+                    <div class="noteColumn show" data-note-column-id="0"></div>
+                    <div class="noteColumn show" data-note-column-id="1" data-column-identifier="middle"></div>
+                    <div class="noteColumn show" data-note-column-id="2" data-column-identifier="right"></div>
                </div>
 
                 <div class="todoFooter">
@@ -155,6 +69,7 @@
         <div class="createTodoModal">
             <div class="modalTitle">
                 <p class="modalTitleText">New Note</p>
+                <div class="createTodoModalCloseIconContainer"></div>
             </div>
             <form action="" class="newNoteForm" id="newNoteForm">
 
@@ -219,6 +134,7 @@
         <div class="addProjectModal">
             <div class="addProjectModalTitle">
                 <p class="AddProjectModalTitleText">New Project</p>
+                <div class="addProjectModalCloseIconContainer"></div>
             </div>
             <form action="" class="newProjectForm" id="newProjectForm">
 
@@ -243,7 +159,6 @@
                 <button class="noButton">No</button>
             </div>
         </div>
-
     </div>
 <script defer src="bundle.js"></script></body>
 </html>
