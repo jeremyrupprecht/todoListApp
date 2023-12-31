@@ -7,10 +7,8 @@ import plusIcon from './images/plusIcon.svg';
 import closeIcon from './images/closeIcon.svg';
 import {parse, format} from 'date-fns';
 import { PubSub } from 'pubsub-js';
-import { title } from 'process';
 
 function renderAllImages() {
-
     // Background image
     const content = document.getElementById('content');
     const backgroundElement = new Image();
@@ -35,9 +33,9 @@ function renderAllImages() {
     deleteProjectButton.appendChild(trashIconElement);
 
     // Modal X icon
-    const closeTodoCreationContainer = document.querySelector('.modalTitle');
+    const closeTodoCreationContainer = document.querySelector('.createTodoModalCloseIconContainer');
     const closeDetailsContainer = document.querySelector('.detailsCloseButton');
-    const closeProjectCreationContainer = document.querySelector('.addProjectModalTitle');
+    const closeProjectCreationContainer = document.querySelector('.addProjectModalCloseIconContainer');
 
     const closeIconElement = new Image();
     closeIconElement.src = closeIcon;
@@ -62,7 +60,6 @@ function renderAllImages() {
     addProjectButton.appendChild(plusIconElement2);
 
     // Add note button
-
     const addNoteButton = document.querySelector('.addNoteButton');
     const plusIconElement3 = new Image();
     plusIconElement3.src = plusIcon;
@@ -70,17 +67,15 @@ function renderAllImages() {
 }
 
 function renderTodoModal(createOrEdit, idOfTodoToEdit) {
-
+    // Show modal
     const modal = document.querySelector('.createTodoModal');
     const modalOverlay = document.querySelector('.modalFullScreenOverlay');
     modal.classList.add('show');
     modalOverlay.classList.add('show');
-
     const closeIconElement = document.querySelector(".todoCreationCloseIcon");
-    const form = document.getElementById('newNoteForm');
 
     // Add listeners to close the modal or submit the form
-
+    const form = document.getElementById('newNoteForm');
     closeIconElement.addEventListener('click', closeModal);
     form.addEventListener('submit', closeForm);
 
@@ -102,25 +97,24 @@ function renderTodoModal(createOrEdit, idOfTodoToEdit) {
         form.removeEventListener('submit', closeForm);
     }
 
+    // Set modal header text
     const modalTitle = document.querySelector('.modalTitleText');
-    modalTitle.innerText = "New Note";
+    modalTitle.innerText = "New Todo";
 
     const submitButton = document.querySelector('.submitButton');
     submitButton.innerText = "ADD TO DO";
 
     // If editing, change the modal title and submission button text,
-    // also preload the todos existing values for editing
-
+    // also preload any existing values for editing
     if (createOrEdit === 'create') return;
-    modalTitle.innerText = "Edit Note";
+    modalTitle.innerText = "Edit Todo";
     submitButton.innerText = "CONFIRM EDIT";
     populateTodoFormWithExistingData(idOfTodoToEdit);
 }
 
 function populateTodoFormWithExistingData(idOfTodoToEdit) {
-
+    // Grab todo data from local storage and populate the form
     const subscription = PubSub.subscribe('sendTodo', function(topicName, todoValues) {
-
         const title = document.getElementById('titleInput');
         const details = document.getElementById('detailsInput');
         const dueDate = document.getElementById('dueDateInput');
@@ -190,7 +184,6 @@ function handleTodoFormData(createOrEdit, idOfTodoToEdit) {
 }
 
 function renderTodo(id, title, details, dueDate, priority) {
-
     // Create Elements
     const todoContainer = document.querySelector('.todoContainer');
     const todoItem = document.createElement('div');
@@ -240,7 +233,7 @@ function renderTodo(id, title, details, dueDate, priority) {
     todoRight.appendChild(editTodoButton);
     todoRight.appendChild(deleteTodoButton);
 
-    // Add form output
+    // Set todo priority color and date text
     priorityElement.style.backgroundColor = priority == 'low' 
     ? 'green' : priority == 'medium' ? 'orange' : 'red'; 
     titleElement.innerText = title;
@@ -249,8 +242,6 @@ function renderTodo(id, title, details, dueDate, priority) {
     const date = parse(dueDate, 'yyyy-MM-dd', new Date());
     const date2 = format(date, 'MMM do');
     dueDateElement.innerText = date2;
-
-    // Add listeners
 
     // Finish the todo 
     isFinishedCheckbox.addEventListener('change', function() {
@@ -285,6 +276,7 @@ function renderTodo(id, title, details, dueDate, priority) {
         PubSub.publishSync('requestProject', {id: todoValues.parentProjectId});
         PubSub.unsubscribe(getParentProjectTitle);
         
+        // Display fetched details
         const detailsModal = document.querySelector('.detailsModal');
         const modalOverlay = document.querySelector('.modalFullScreenOverlay');
         detailsModal.classList.add('show');
@@ -352,7 +344,6 @@ function renderFinishedTodo(todoId, finished) {
 }
 
 function renderTodosForProject(projectId) {
-
     // Clear any existing todos
     const todoContainer = document.querySelector('.todoContainer');
     todoContainer.classList.add('show');
@@ -416,7 +407,6 @@ function renderTodosForProject(projectId) {
     // The today and week projects (not the home project) CANNOT have todos directly
     // added to them (the today and week projects only display todos from OTHER projects
     // due at those dates)
-
     const addTodoButton = document.querySelector('.addTodoButton');
     if (projectId == 1 || projectId == 2) {
         addTodoButton.classList.remove('show');
@@ -437,7 +427,6 @@ function renderTodoCounts() {
     PubSub.unsubscribe(getAllProjectsSubscription);
 
     for (let i = 0; i < allProjects.length; i++) {
-
         // Grab number of unfinished todos for this project
         let unfinishedTodosCount = 0;
 
@@ -466,7 +455,6 @@ function renderTodoCounts() {
         }
 
         // Then display the number of unfinished todos for this project
-
         const projectContainer = document.querySelector(`p[data-project-id="${allProjects[i].id}"]`).parentNode;
         const todoCountContainer = projectContainer.querySelector('.todoCountContainer');
 
@@ -530,7 +518,7 @@ function renderProject(projectId, title) {
 
     projectsContainer.appendChild(newProjectContainer);
     
-    // add event listener
+    // Add event listener
     newProjectHeader.addEventListener('click', function() {
         currentProject = projectId;
         highlightActiveProjectHeader.call(this);
@@ -542,7 +530,6 @@ function renderProject(projectId, title) {
 }
 
 function renderExistingProjects() {
-
     // There are 3 default projects (home, today, and week), with ids 0,1 and 2
     // respectively, if there are other existing projects, their id's start 
     // counting up from 3
@@ -592,7 +579,6 @@ function renderProjectModal(createOrEdit) {
 
     function submitForm(e) {
         e.preventDefault();
-
         if (createOrEdit == 'create') {
             handleProjectFormData('create');
         } else {
@@ -609,7 +595,6 @@ function renderProjectModal(createOrEdit) {
 
     // If editing, change the modal title and submission button text,
     // also preload the todos existing values for editing
-
     if (createOrEdit === 'create') return;
     modalTitle.innerText = "Edit Project";
     submitButton.innerText = "CONFIRM EDIT";
@@ -617,9 +602,7 @@ function renderProjectModal(createOrEdit) {
 }
 
 function populateProjectFormWithExistingTitle() {
-
     const currentProjectid = currentProject;
-
     const subscription = PubSub.subscribe('sendProject', function(topicName, project) {
         const title = document.getElementById('projectTitleInput');
         title.value = project.title;
@@ -629,7 +612,6 @@ function populateProjectFormWithExistingTitle() {
 }
 
 function renderDeleteProjectModal() {
-    
     // Show modal
     const deleteProjectModal = document.querySelector('.areYouSureModal');
     const modalOverlay = document.querySelector('.modalFullScreenOverlay');
@@ -639,7 +621,6 @@ function renderDeleteProjectModal() {
     // Grab and render project name
     const idOfProjectToDelete = currentProject;
     let projectTitle = "";
-
     const subscription = PubSub.subscribe('sendProject', function(topicName, project) {
         projectTitle = project.title;
     });
@@ -665,7 +646,6 @@ function renderDeleteProjectModal() {
     }
 
     function handleDeleteProject() {
-
         // Delete project from database
         PubSub.publishSync('deleteProjectFromDOM', idOfProjectToDelete);
         
@@ -674,14 +654,14 @@ function renderDeleteProjectModal() {
         const projectElementContainer = projectElementToDelete.parentElement;
         projectElementContainer.remove();
 
-        // Change currently viewed project (AND CURRENT PROJECT VARIABLE) to home 
+        // Change currently viewed project (and current project variable) to home 
         currentProject = 0;
         renderTodosForProject(0);
 
-        // Update todo counts (for this project and today and week of the 
-        // project had any todos that were presented there)
+        // Update todo counts (for the deleted project and also the 'Today' and 'Week'
+        // projects if there were any todos of this project that were displayed
+        // there 
         renderTodoCounts();
-
         closeModal();
     }
 }
@@ -701,7 +681,6 @@ function hoverProjectOut() {
 }
 
 function highlightActiveProjectHeader() {
-    
     // Clear all other highlighted headers
     const allProjectTitleHeaders = document.querySelectorAll(`p[data-project-id]`);
     for (let i = 0; i < allProjectTitleHeaders.length; i++) {
@@ -718,7 +697,6 @@ function highlightActiveProjectHeader() {
 }
 
 function renderNotes() {
-
     // Render notes container 
     const todoContainer = document.querySelector('.todoContainer');
     todoContainer.classList.remove('show');
@@ -750,6 +728,7 @@ function renderNotes() {
     });
     PubSub.publishSync('requestAllNotes');
     PubSub.unsubscribe(subscription);
+
     // Sort the list so the notes appear in order
     notes.sort((n1, n2) => n1.id - n2.id);
     for (let i = 0; i < notes.length; i++) {
@@ -771,7 +750,6 @@ function addAndRenderNote() {
 }
 
 function renderNote(id) {
-
     const noteItem = document.createElement('div');
     const noteTitle = document.createElement('div');
     const noteDetails = document.createElement('div');
@@ -818,6 +796,7 @@ function renderNote(id) {
     noteItem.appendChild(noteFlexbox);
     noteItem.appendChild(noteDetails);
 
+    // Only add notes to the column with the smallest number of notes
     const shortestColumn = getShortestNoteColumn(3);
     if (shortestColumn) {
         shortestColumn.appendChild(noteItem);
@@ -890,9 +869,11 @@ function renderNoteColumnsBasedOnScreenSize() {
 
 // For thinner screen sizes, use 2 note columns instead of 3
 window.addEventListener('resize', () => {
+    if (currentProject != -1) return;
     renderNoteColumnsBasedOnScreenSize();
     renderNotes();
 }, true);
+
 
 let currentProject = 0;
 let currentNumberOfNoteColumns = 3;
@@ -954,7 +935,6 @@ function setupListeners() {
     });
 
     // Edit and delete project buttons
-
     const editProjectButton = document.querySelector('.editProjectButton');
     const deleteProjectButton = document.querySelector('.deleteProjectButton');
     editProjectButton.addEventListener('click', () => {
@@ -963,13 +943,11 @@ function setupListeners() {
 
     deleteProjectButton.addEventListener('click', () => {
         renderDeleteProjectModal();
-        // FIX THIS
     });
 
     // Add notes button
     const addNoteButton = document.querySelector('.addNoteButton');
     addNoteButton.addEventListener('click', addAndRenderNote);
-
 }
 
 export {renderScreen, setupListeners}

@@ -10,12 +10,6 @@ const notePrototype = {
     getNote: function() {
         return {id: this.id, title: this.title, details: this.details}
     },
-    // setTitle: function(title) {
-    //     this.title = title;
-    // },
-    // setDetails: function(details) {
-    //     this.details = details;
-    // },
 }
 
 export { createNote }

@@ -67,8 +67,6 @@ button {
     flex-direction: column;
     padding: 50px 50px 50px 50px;
     gap: 20px;
-
-    /* border: 1px solid white; */
 }
 
 
@@ -79,7 +77,6 @@ button {
 
 .sideBar > div {
     display: flex;
-    /* border: 1px solid white; */
 }
 
 .todoCountContainer {
@@ -117,7 +114,6 @@ button {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    /* border: 1px solid white; */
 }
 
 .newProjectContainer {
@@ -335,10 +331,13 @@ input[type="checkbox"] {
     padding: 15px 15px 10px 15px;
     border-radius: 20px 20px 0px 0px;
     display: flex;
+    justify-content: space-between;
 }
 
-.modalTitle img {
+.createTodoModalCloseIconContainer {
     margin-left: auto;
+    height: 24px;
+    width: 24px;
 }
 
 .newNoteForm {
@@ -353,7 +352,6 @@ input[type="checkbox"] {
 
 .formRow {
     width: 100%;
-    /* border: 1px solid white; */
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
@@ -543,9 +541,13 @@ input[type="radio"] {
     justify-content: space-between;
 }
 
+.addProjectModalCloseIconContainer {
+    height: 24px;
+    width: 24px;
+}
+
 .formRowProject {
     width: 100%;
-    /* border: 1px solid white; */
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;

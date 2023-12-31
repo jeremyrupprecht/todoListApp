@@ -19,7 +19,6 @@ function createNoteManager() {
     }
 
     const createAndSaveNote = (title, details) => {
-
         let id = localStorage.getItem('noteIdCount');
         if (!id) {
             localStorage.setItem('noteIdCount', 0);
@@ -56,6 +55,7 @@ function createNoteManager() {
         console.log('This note does not exist!');
     }
 
+    // PubSub Subscriptions
     const listenForCreatedNotes = PubSub.subscribe('createNote', function(topicName, requestType) {
         const newNote = createAndSaveNote(requestType.title, requestType.details);
         PubSub.publishSync('assignNote', newNote.getNote());

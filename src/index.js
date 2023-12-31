@@ -6,7 +6,6 @@ import { createNoteManager } from './noteManager';
 import { renderScreen, setupListeners} from './domManager';
 
 function preloadTodoData() {
-
     // Need to load template todos if there are none (like when the user first
     // opens the site)
     if (!localStorage.getItem('todoIdCount')) {
@@ -18,7 +17,6 @@ function preloadTodoData() {
         const date3 = format(new Date(2023, 11, 24), 'yyyy-MM-dd');
 
         // Set up a loop for these
-
         const values0 = {title: 'TODO 0', details: 'DETAILS0', dueDate: date0, 
         priority: 'low', isFinished: false, parentProjectId: 0};
         PubSub.publishSync('createTodo', values0);
@@ -39,30 +37,10 @@ function preloadTodoData() {
         priority: 'low', isFinished: false, parentProjectId: 0};
         PubSub.publishSync('createTodo', values4);
 
-        // const values5 = {title: 'TODO 5', details: 'DETAILS5', dueDate: date3, 
-        // priority: 'low', isFinished: false, parentProjectId: 0};
-        // PubSub.publishSync('createTodo', values3);
-
-        // const values6 = {title: 'TODO 6', details: 'DETAILS6', dueDate: date3, 
-        // priority: 'low', isFinished: false, parentProjectId: 0};
-        // PubSub.publishSync('createTodo', values3);
-
-        // const values7 = {title: 'TODO 7', details: 'DETAILS7', dueDate: date3, 
-        // priority: 'low', isFinished: false, parentProjectId: 0};
-        // PubSub.publishSync('createTodo', values3);
-
-        // const values8 = {title: 'TODO 8', details: 'DETAILS8', dueDate: date3, 
-        // priority: 'low', isFinished: false, parentProjectId: 0};
-        // PubSub.publishSync('createTodo', values3);
-
-        // const values9 = {title: 'TODO 9', details: 'DETAILS9', dueDate: date3, 
-        // priority: 'low', isFinished: false, parentProjectId: 0};
-        // PubSub.publishSync('createTodo', values3);
     }
 }
 
 function preloadNoteData() {
-
     if (!localStorage.getItem('noteIdCount')) {
         console.log("Empty local storage detected, preloading note data...");
 
@@ -91,7 +69,6 @@ function preloadNoteData() {
         PubSub.publishSync('createNote', values7);
         
     }
-
 }
 
 function createDefaultProjects() {

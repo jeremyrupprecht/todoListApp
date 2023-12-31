@@ -1,6 +1,6 @@
 import { createTodo } from "./todo";
 import { PubSub } from 'pubsub-js';
-import { parseISO, format, startOfToday, startOfWeek, endOfWeek} from 'date-fns';
+import { format, startOfToday, startOfWeek, endOfWeek } from 'date-fns';
 
 function createTodoManager() {
 
@@ -19,13 +19,6 @@ function createTodoManager() {
         }
         return allTodos;
     }
-
-    // const getAllTodosDueBeforeThisDate = (date) => {
-    //     const allTodos = getAllTodos();
-    //     const todosBeforeThisDate = allTodos.filter((todo) => 
-    //     parseISO(todo.dueDate).getTime() <= parseISO(date).getTime());
-    //     return todosBeforeThisDate;
-    // }
 
     const getAllTodosDueToday = () => {
         const allTodos = getAllTodos();
@@ -75,7 +68,6 @@ function createTodoManager() {
         return todosToReturn;
     }
 
-    // This publishes to the PubSub mediator
     const createAndSaveTodo = (title, details, dueDate, priority, isFinished, parentProjectId) => {
         // Give the todo an id (this id does not decrease if a todo is 
         // deleted, to prevent duplicate ids)
@@ -92,15 +84,14 @@ function createTodoManager() {
             }
             localStorage.setItem('todoIdCount', id);
         }
-
         const newTodo = createTodo(id, title, details, dueDate, priority, isFinished, parentProjectId);
         localStorage.setItem(`todo-${id}`, JSON.stringify(newTodo.getTodo())); 
         return newTodo;
     }
 
     const editTodo = (idOfTodoToEdit, title, details, dueDate, priority) => {
-
         const todoFromStorage = JSON.parse(localStorage.getItem(`todo-${idOfTodoToEdit}`));
+
         if (todoFromStorage) {
             const editedTodo = createTodo(idOfTodoToEdit, title, details, dueDate, 
                                           priority, todoFromStorage.isFinished,
@@ -122,7 +113,6 @@ function createTodoManager() {
         }
     }
 
-    // This publishes to the PubSub mediator
     const deleteTodo = (idOfTodoToDelete) => {
         if (localStorage.getItem(`todo-${idOfTodoToDelete}`)) {
             // Publish todo deletion to project manager
@@ -141,8 +131,7 @@ function createTodoManager() {
         }
     }
 
-    // Subscribe to / listen for project deletion events --> need to delete all
-    // todos associated with the deleted project
+    // PubSub Subscriptions
     const listenForDeletedProjects = PubSub.subscribe('deleteProject', function(topicName, idOfProjectToDelete) {
         deleteAllTodosForThisProject(idOfProjectToDelete);
     });

@@ -42,7 +42,6 @@ function createProjectManager() {
     }
 
     const createAndSaveProject = (title) => {
-
         // Give the project an id (this id does not decrease if a project is 
         // deleted, to prevent duplicate ids)
         let id = localStorage.getItem('projectIdCount');
@@ -74,9 +73,8 @@ function createProjectManager() {
         localStorage.removeItem(`project-${idOfProjectToDelete}`);
     }
 
-    // Subscribe to / listen for todo creation events and todo deletion events
-    // --> as the project associated with the created or deleted todo needs to
-    // update its list of todo references (for display later)
+    // Listen for todo creations or deletions as the associated projects 
+    // need to update their lists of todo references (for display later)
     const listenForCreatedTodos = PubSub.subscribe('addTodoReferenceToProject', function(topicName, idOfTodoToAdd) {
         addTodoToProject(idOfTodoToAdd);
     });
